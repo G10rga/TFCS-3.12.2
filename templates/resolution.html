@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Resolution Solver — FormalCS{% endblock %}
+
+{% block extra_css %}
+<style>
+.clause-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: var(--radius-sm);
+    background: var(--red-dim); border: 1px solid rgba(255,92,122,0.25);
+    font-family: var(--font-mono); font-size: 12px; color: var(--red);
+    margin: 3px;
+}
+.resolvent-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: var(--radius-sm);
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+    font-family: var(--font-mono); font-size: 12px; color: var(--accent);
+    margin: 3px;
+}
+.empty-clause {
+    padding: 5px 12px; border-radius: var(--radius-sm);
+    background: var(--green-dim); border: 1px solid rgba(61,230,138,0.3);
+    font-family: var(--font-mono); font-size: 13px; color: var(--green);
+    font-weight: 700;
+}
+.transform-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--bg-card);
+    margin-bottom: 8px;
+}
+.transform-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted); min-width: 60px;
+}
+.transform-formula { font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); flex: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <span class="page-tag">Module 03</span>
+        <h1 class="page-title">Resolution Solver</h1>
+        <p class="page-subtitle">Enter a propositional formula. The solver converts it to CNF, extracts clauses, and applies the resolution method to determine satisfiability.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <span class="badge badge-error">Resolution</span>
+        <span class="badge badge-warning">SAT</span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap:24px;align-items:start">
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">⊢□</div> Formula Input</div>
+            </div>
+
+            <div class="info-box">
+                <span>ℹ</span>
+                <div style="line-height:1.8">
+                    Operators: <code>~</code> NOT &nbsp;|&nbsp; <code>&</code> AND &nbsp;|&nbsp; <code>|</code> OR &nbsp;|&nbsp; <code>-></code> IMP &nbsp;|&nbsp; <code>&lt;-></code> IFF<br>
+                    Example: <code>(p -> q) & (~q) & p</code>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Propositional Formula <span class="required">*</span></label>
+                <input class="form-input" id="res-formula" placeholder="(p -> q) & (~q) & p" value="(p -> q) & (~q) & p" style="font-size:15px;padding:12px 14px">
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center">Examples:</span>
+                <button class="example-btn" onclick="loadEx('(p -> q) & (~q) & p')">Modus Tollens (UNSAT)</button>
+                <button class="example-btn" onclick="loadEx('p | ~p')">Tautology</button>
+                <button class="example-btn" onclick="loadEx('(p | q) & (~p | r) & (~q | ~r) & (~r)')">Complex UNSAT</button>
+                <button class="example-btn" onclick="loadEx('p & q & ~p')">Contradiction</button>
+            </div>
+
+            <!-- Symbol pad -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center">Insert:</span>
+                <button class="sym-btn" onclick="insertSym('~')">¬ NOT</button>
+                <button class="sym-btn" onclick="insertSym(' & ')">∧ AND</button>
+                <button class="sym-btn" onclick="insertSym(' | ')">∨ OR</button>
+                <button class="sym-btn" onclick="insertSym(' -> ')">→ IMP</button>
+                <button class="sym-btn" onclick="insertSym(' <-> ')">↔ IFF</button>
+                <button class="sym-btn" onclick="insertSym('(')"> ( </button>
+                <button class="sym-btn" onclick="insertSym(')')"> ) </button>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%" id="btn-solve" data-primary onclick="solveResolution()">
+                ▶ Solve with Resolution
+            </button>
+        </div>
+    </div>
+
+    <div id="res-result">
+        <div class="empty-state" style="padding:48px 24px">
+            <div class="empty-icon">⊢□</div>
+            <div class="empty-title">Ready to solve</div>
+            <div class="empty-sub">Enter a formula and click Solve to see the full resolution proof</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.example-btn {
+    font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:20px;
+    border:1px solid var(--border);background:transparent;color:var(--text-muted);
+    cursor:pointer;transition:all var(--transition);
+}
+.example-btn:hover { color:var(--text-primary);border-color:var(--accent-border);background:var(--accent-dim); }
+.sym-btn {
+    font-family:var(--font-mono);font-size:12px;padding:4px 10px;border-radius:var(--radius-sm);
+    border:1px solid var(--border);background:var(--bg-input);color:var(--text-secondary);
+    cursor:pointer;transition:all var(--transition);
+}
+.sym-btn:hover { color:var(--accent);border-color:var(--accent-border); }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadEx(f) {
+    document.getElementById('res-formula').value = f;
+    showToast('Example loaded!', 'success', 2000);
+}
+
+function insertSym(sym) {
+    const inp = document.getElementById('res-formula');
+    const s = inp.selectionStart, e = inp.selectionEnd;
+    inp.value = inp.value.slice(0, s) + sym + inp.value.slice(e);
+    inp.selectionStart = inp.selectionEnd = s + sym.length;
+    inp.focus();
+}
+
+async function solveResolution() {
+    const btn = document.getElementById('btn-solve');
+    const formula = document.getElementById('res-formula').value.trim();
+    if (!formula) { showToast('Please enter a formula', 'error'); return; }
+
+    const result = await apiCall('/api/resolution/solve', { formula }, btn);
+    if (!result) return;
+    if (result.error) { showToast(result.error, 'error'); return; }
+    renderResult(result);
+}
+
+function renderResult(r) {
+    const area = document.getElementById('res-result');
+    const proof = r.proof;
+    const sat = proof.satisfiable;
+
+    let html = `
+    <div style="margin-bottom:16px;padding:16px 20px;border-radius:var(--radius-md);display:flex;align-items:center;gap:12px;
+        font-family:var(--font-display);font-size:18px;font-weight:700;
+        background:${sat ? 'var(--green-dim)' : 'var(--red-dim)'};
+        border:1px solid ${sat ? 'rgba(61,230,138,0.3)' : 'rgba(255,92,122,0.3)'};
+        color:${sat ? 'var(--green)' : 'var(--red)'}">
+        <span>${sat ? '✓' : '✗'}</span>
+        <span>${proof.conclusion}</span>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">⟺</div> Transformation to CNF</div>
+        </div>
+        ${r.transformation_steps.map(s => `
+        <div class="transform-row">
+            <span class="transform-label">${s.label}</span>
+            <span class="transform-formula">${s.formula}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">≡</div> Clause Set</div>
+            <span class="badge badge-error">${r.clauses.length} clause${r.clauses.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${r.clauses.map((c, i) => `<span class="clause-chip">C${i+1}: {${c.map(l => l.startsWith('~') ? '¬'+l.slice(1) : l).join(' ∨ ') || '□'}}</span>`).join('')}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">⊢</div> Resolution Proof</div>
+            <span class="badge ${sat ? 'badge-success' : 'badge-error'}">${proof.steps.length} steps</span>
+        </div>
+        <div class="step-list">
+    `;
+
+    proof.steps.forEach((step, i) => {
+        const isGiven = step.type === 'given';
+        const isEmpty = step.clause && step.clause.length === 0;
+        const delay = Math.min(i * 20, 400);
+
+        const clauseStr = step.clause && step.clause.length > 0
+            ? step.clause.map(l => l.startsWith('~') ? '¬'+l.slice(1) : l).join(' ∨ ')
+            : '□ (empty clause)';
+
+        const fromStr = step.from ? `<span style="color:var(--text-muted);font-size:11px">from ${step.from.join(', ')}</span>` : '';
+
+        html += `
+        <div class="step-item ${isEmpty ? 'step-accept' : ''}" style="animation-delay:${delay}ms">
+            <div class="step-num">${step.label}</div>
+            <div class="step-content">
+                <strong style="color:${isGiven ? 'var(--blue)' : isEmpty ? 'var(--green)' : 'var(--accent)'}">${clauseStr}</strong>
+                ${fromStr}<br>
+                <span style="color:var(--text-muted);font-size:11px">${isGiven ? 'Given clause' : 'Resolved'}</span>
+            </div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+    area.innerHTML = html;
+}
+</script>
+{% endblock %}

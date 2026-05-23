@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}About & Documentation — FormalCS{% endblock %}
+
+{% block extra_css %}
+<style>
+.doc-section { margin-bottom: 48px; }
+.doc-section-title {
+    font-family: var(--font-display); font-size: 22px; font-weight: 800;
+    letter-spacing: -0.03em; color: var(--text-primary); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+}
+.doc-section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.doc-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px;
+    transition: all var(--transition);
+}
+.doc-card:hover { border-color: var(--border-hover); }
+.doc-card-title {
+    font-family: var(--font-display); font-size: 16px; font-weight: 700;
+    color: var(--text-primary); margin-bottom: 8px; display: flex;
+    align-items: center; gap: 10px;
+}
+.doc-card p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
+.doc-card p:last-child { margin-bottom: 0; }
+.api-endpoint {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    background: var(--bg-code); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    margin-bottom: 8px; font-family: var(--font-mono); font-size: 13px;
+}
+.method-badge {
+    padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; flex-shrink: 0;
+}
+.method-post { background: rgba(245,166,35,0.2); color: var(--accent); border: 1px solid var(--accent-border); }
+.method-get  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(61,230,138,0.2); }
+.endpoint-path { color: var(--text-primary); }
+.endpoint-desc { color: var(--text-muted); margin-left: auto; font-size: 12px; }
+
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tech-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px; display: flex; flex-direction: column; gap: 6px;
+}
+.tech-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.tech-role { font-size: 12px; color: var(--text-secondary); }
+.tech-badge { align-self: flex-start; }
+
+.algo-step {
+    display: flex; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 8px;
+}
+.algo-step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim);
+    border: 1px solid var(--accent-border); color: var(--accent); font-family: var(--font-mono);
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.algo-step-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.algo-step-text strong { color: var(--text-primary); }
+
+.install-block {
+    background: var(--bg-code); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 18px; font-family: var(--font-mono); font-size: 13px;
+    color: var(--green); line-height: 2; overflow-x: auto; position: relative;
+}
+.install-block .comment { color: var(--text-muted); }
+.install-block .cmd { color: var(--accent); }
+.copy-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-muted); font-size: 11px; padding: 4px 10px; cursor: pointer;
+    font-family: var(--font-mono); transition: all var(--transition);
+}
+.copy-btn:hover { color: var(--text-primary); border-color: var(--accent-border); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <span class="page-tag">Documentation</span>
+        <h1 class="page-title">About & Docs</h1>
+        <p class="page-subtitle">Architecture overview, API reference, algorithm explanations, and installation guide.</p>
+    </div>
+</div>
+
+<!-- ── Overview ─────────────────────────────────────────── -->
+<div class="doc-section">
+    <div class="doc-section-title">Project Overview</div>
+    <div class="doc-card">
+        <div class="doc-card-title">🎓 FormalCS Platform</div>
+        <p>
+            A full-stack web application implementing Three formal methods modules: Finite Automata Simulator,
+            Resolution Method Solver, and NNF/CNF/DNF Transformer.
+
+
+        </p>
+        <p>
+            All computational logic is implemented in <strong style="color:var(--accent)">Python</strong> on a Flask backend.
+            JavaScript is used exclusively for UI interactivity, visualization, and asynchronous requests to the API.
+            The frontend uses Cytoscape.js for graph rendering of automata state diagrams.
+        </p>
+
+    </div>
+</div>
+
+<!-- ── Architecture ─────────────────────────────────────── -->
+<div class="doc-section">
+    <div class="doc-section-title">Architecture</div>
+    <div class="doc-card">
+        <div class="doc-card-title">📐 Project Structure</div>
+        <div class="install-block" style="color:var(--text-secondary); white-space: pre; overflow-x: auto;">TFCS/
+├── <span style="color:var(--accent)">app.py</span>
+├── requirements.txt
+├── <span style="color:var(--accent)">algorithms/</span>
+│   ├── automata.py
+│   ├── pda.py
+│   ├── resolution.py
+│   └── transformer.py
+├── <span style="color:var(--blue)">templates/</span>
+│   ├── base.html
+│   ├── index.html
+│   ├── automata.html
+│   ├── resolution.html
+│   ├── transformer.html
+│   └── about.html
+└── <span style="color:var(--green)">static/</span>
+    ├── css/
+    │   ├── main.css
+    └── js/
+        │   ├──main.js</div>
+    </div>
+</div>
+
+<!-- ── Modules ──────────────────────────────────────────── -->
+<div class="doc-section">
+    <div class="doc-section-title">Module Documentation</div>
+
+    <div class="doc-card">
+        <div class="doc-card-title"> Module 1 — Finite Automata Simulator</div>
+        <p>Simulates both DFA (Deterministic Finite Automaton) and NFA (Non-deterministic Finite Automaton) machines on input strings.</p>
+        <p><strong style="color:var(--text-primary)">Python implementation:</strong> <code>algorithms/automata.py</code> — <code>FiniteAutomaton</code> class handles state transitions, ε-closure computation for NFA, acceptance checking, and step-by-step tracing. The <code>get_graph_data()</code> method returns nodes and edges for Cytoscape.js rendering.</p>
+
+    </div>
+
+
+    <div class="doc-card">
+        <div class="doc-card-title"> Module 2 — Resolution Method Solver</div>
+        <p>Applies resolution to propositional logic formulas. Converts formula to CNF, extracts clauses, then iteratively applies resolution until empty clause (UNSAT) or saturation (SAT).</p>
+        <p><strong style="color:var(--text-primary)">Python implementation:</strong> <code>algorithms/resolution.py</code> — full recursive-descent parser → AST transformations (eliminate_iff → eliminate_imp → push_negation → distribute_or) → clause extraction → <code>resolution_solver()</code>.</p>
+    </div>
+
+    <div class="doc-card">
+        <div class="doc-card-title">⟺ Module 3 — Formula Transformer (NNF / CNF / DNF)</div>
+        <p>Transforms any propositional formula to NNF, CNF, and DNF with detailed step annotations. Also generates truth tables and classifies formulas as tautology, contradiction, or satisfiable.</p>
+        <p><strong style="color:var(--text-primary)">Python implementation:</strong> <code>algorithms/transformer.py</code> uses the same AST system as resolution.py. <code>to_nnf()</code>, <code>to_cnf()</code>, <code>to_dnf()</code> use different distribution directions. <code>compute_truth_table()</code> evaluates over all 2ⁿ assignments.</p>
+    </div>
+
+    </div>
+</div>
+
+<!-- ── API Reference ────────────────────────────────────── -->
+<div class="doc-section">
+    <div class="doc-section-title">API Reference</div>
+    <div class="doc-card">
+        <div class="doc-card-title">🔌 REST Endpoints</div>
+        <div class="api-endpoint">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/automata/simulate</span>
+            <span class="endpoint-desc">Simulate FA on input string</span>
+        </div>
+        <div class="api-endpoint">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/automata/graph</span>
+            <span class="endpoint-desc">Get graph data only</span>
+        </div>
+
+
+        <div class="api-endpoint">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/resolution/solve</span>
+            <span class="endpoint-desc">Resolution method proof</span>
+        </div>
+        <div class="api-endpoint">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/api/transformer/transform</span>
+            <span class="endpoint-desc">NNF / CNF / DNF + truth table</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Technologies ─────────────────────────────────────── -->
+<div class="doc-section">
+    <div class="doc-section-title">Technologies Used</div>
+    <div class="tech-grid">
+        <div class="tech-card">
+            <div class="tech-name">Python 3.13+</div>
+            <div class="tech-role">All algorithms & backend logic</div>
+            <span class="badge badge-warning tech-badge">Core</span>
+        </div>
+        <div class="tech-card">
+            <div class="tech-name">Flask 3.1.3</div>
+            <div class="tech-role">Web framework & REST API</div>
+            <span class="badge badge-info tech-badge">Backend</span>
+        </div>
+        <div class="tech-card">
+            <div class="tech-name">Jinja2</div>
+            <div class="tech-role">HTML templating with inheritance</div>
+            <span class="badge badge-info tech-badge">Backend</span>
+        </div>
+        <div class="tech-card">
+            <div class="tech-name">Cytoscape.js</div>
+            <div class="tech-role">Automata graph visualization</div>
+            <span class="badge badge-purple tech-badge">Frontend</span>
+        </div>
+        <div class="tech-card">
+            <div class="tech-name">Vanilla JS</div>
+            <div class="tech-role">UI interactions & fetch API</div>
+            <span class="badge badge-success tech-badge">Frontend</span>
+        </div>
+        <div class="tech-card">
+            <div class="tech-name">CSS Variables</div>
+            <div class="tech-role">Design system & theming</div>
+            <span class="badge badge-success tech-badge">Frontend</span>
+        </div>
+    </div>
+</div>
+
+<!-- ── Installation ─────────────────────────────────────── -->
+
+</div>
+{% endblock %}

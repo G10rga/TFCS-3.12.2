@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Project By G1orga{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="noise-overlay"></div>
+
+    <!-- NAVBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M4 16L16 4L28 16L16 28Z" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="16" cy="16" r="4" fill="currentColor"/>
+                        <path d="M16 4V8M16 24V28M4 16H8M24 16H28" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">Project By G1orga</span>
+                    <span class="logo-sub">Version 3.12.2</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="section-label">Modules</span>
+            <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14M3 8h14M3 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/automata" class="nav-item {% if request.path == '/automata' %}active{% endif %}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 10h4" stroke="currentColor" stroke-width="1.5"/><path d="M15 7V4M15 16v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Automata Simulator</span>
+            </a>
+
+            </a>
+            <a href="/resolution" class="nav-item {% if request.path == '/resolution' %}active{% endif %}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M9 6h2l2 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Resolution Solver</span>
+            </a>
+            <a href="/transformer" class="nav-item {% if request.path == '/transformer' %}active{% endif %}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M5 10h10M7 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Formula Transformer</span>
+            </a>
+
+        </div>
+
+        <div class="sidebar-section sidebar-bottom">
+            <span class="section-label">Info</span>
+            <a href="/about" class="nav-item {% if request.path == '/about' %}active{% endif %}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 7v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>About & Docs</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- MOBILE FRIENDLY TOGGLE -->
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
+
+    <!-- MAIN -->
+    <main class="main-content" id="mainContent">
+        <div class="page-inner">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

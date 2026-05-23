@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Unification Solver — FormalCS{% endblock %}
+
+{% block extra_css %}
+<style>
+.term-box {
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; font-family: var(--font-mono); font-size: 15px;
+    color: var(--text-primary); flex: 1;
+}
+.unify-arrow {
+    font-size: 22px; color: var(--text-muted); flex-shrink: 0; align-self: center;
+    font-family: var(--font-mono);
+}
+.subst-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    background: var(--bg-card); border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm); margin-bottom: 6px;
+    font-family: var(--font-mono); font-size: 13px;
+}
+.subst-var { color: var(--purple); font-weight: 600; min-width: 60px; }
+.subst-arrow { color: var(--text-muted); }
+.subst-term { color: var(--accent); }
+
+.step-badge {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
+}
+.step-badge-bind { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.step-badge-decomp { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(91,159,255,0.2); }
+.step-badge-ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(61,230,138,0.2); }
+.step-badge-fail { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,92,122,0.2); }
+.step-badge-sub { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+.step-badge-init { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+
+.unified-display {
+    font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+    color: var(--green); background: var(--green-dim); border: 1px solid rgba(61,230,138,0.25);
+    border-radius: var(--radius-md); padding: 16px 20px; text-align: center; margin-bottom: 16px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <span class="page-tag">Module 05</span>
+        <h1 class="page-title">Unification Solver</h1>
+        <p class="page-subtitle">Apply Robinson's unification algorithm to two first-order logic terms. Computes the Most General Unifier (MGU) with full step-by-step substitution trace.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <span class="badge badge-purple">MGU</span>
+        <span class="badge badge-info">Robinson's</span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap:24px;align-items:start">
+    <!-- Input -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">≡</div> Term Input</div>
+            </div>
+
+            <div class="info-box">
+                <span>ℹ</span>
+                <div style="line-height:1.9">
+                    <strong>Variables:</strong> start with uppercase: <code>X</code>, <code>Y</code>, <code>Var</code><br>
+                    <strong>Constants:</strong> lowercase: <code>a</code>, <code>b</code>, <code>john</code><br>
+                    <strong>Functions:</strong> <code>f(X, a)</code>, <code>g(X, Y, Z)</code><br>
+                    <strong>Predicates:</strong> <code>p(X, f(a))</code>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Term 1 <span class="required">*</span></label>
+                <input class="form-input" id="uni-t1" value="f(X, g(Y))" placeholder="f(X, g(Y))" style="font-size:15px;padding:12px 14px">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Term 2 <span class="required">*</span></label>
+                <input class="form-input" id="uni-t2" value="f(a, g(b))" placeholder="f(a, g(b))" style="font-size:15px;padding:12px 14px">
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center">Examples:</span>
+                <button class="ex-btn" onclick="loadEx('f(X, g(Y))', 'f(a, g(b))')">Variable binding</button>
+                <button class="ex-btn" onclick="loadEx('p(X, f(X))', 'p(b, f(b))')">Predicate</button>
+                <button class="ex-btn" onclick="loadEx('f(X, Y)', 'f(g(Z), Z)')">Nested</button>
+                <button class="ex-btn" onclick="loadEx('f(X)', 'g(X)')">Fail: clash</button>
+                <button class="ex-btn" onclick="loadEx('X', 'f(X)')">Fail: occurs</button>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%" id="btn-unify" data-primary onclick="runUnify()">
+                ≡ Unify Terms
+            </button>
+        </div>
+
+        <!-- Convention box -->
+        <div class="card" style="margin-top:16px">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">📐</div> Algorithm Overview</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-secondary);line-height:1.9">
+                <strong style="color:var(--text-primary)">Robinson's Unification (1965):</strong><br>
+                1. If both terms identical → success<br>
+                2. If one is a variable → bind (with occurs check)<br>
+                3. If both are functions → same functor &amp; arity → unify args pairwise<br>
+                4. Otherwise → fail (clash / arity mismatch)<br><br>
+                <strong style="color:var(--text-primary)">Occurs Check:</strong> ensures variable <em>X</em> is not bound to a term containing <em>X</em>, preventing infinite terms.
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="uni-result">
+        <div class="empty-state" style="padding:48px 24px">
+            <div class="empty-icon">≡</div>
+            <div class="empty-title">Ready to unify</div>
+            <div class="empty-sub">Enter two terms and click Unify to see the MGU computation</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ex-btn {
+    font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:20px;
+    border:1px solid var(--border);background:transparent;color:var(--text-muted);
+    cursor:pointer;transition:all var(--transition);
+}
+.ex-btn:hover { color:var(--text-primary);border-color:var(--accent-border);background:var(--accent-dim); }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadEx(t1, t2) {
+    document.getElementById('uni-t1').value = t1;
+    document.getElementById('uni-t2').value = t2;
+    showToast('Example loaded!', 'success', 2000);
+}
+
+async function runUnify() {
+    const btn = document.getElementById('btn-unify');
+    const t1 = document.getElementById('uni-t1').value.trim();
+    const t2 = document.getElementById('uni-t2').value.trim();
+    if (!t1 || !t2) { showToast('Both terms required', 'error'); return; }
+
+    const result = await apiCall('/api/unification/unify', { term1: t1, term2: t2 }, btn);
+    if (!result) return;
+    if (result.error) { showToast(result.error, 'error'); return; }
+    renderResult(result, t1, t2);
+}
+
+const stepBadgeClass = {
+    init: 'step-badge-init',
+    identical: 'step-badge-ok',
+    bind_var: 'step-badge-bind',
+    decompose: 'step-badge-decomp',
+    subproblem: 'step-badge-sub',
+    result: 'step-badge-ok',
+    fail_occurs: 'step-badge-fail',
+    fail_clash: 'step-badge-fail',
+    fail_arity: 'step-badge-fail',
+    fail: 'step-badge-fail'
+};
+const stepLabel = {
+    init: 'GOAL',
+    identical: 'SAME',
+    bind_var: 'BIND',
+    decompose: 'DECOMP',
+    subproblem: 'SUB',
+    result: 'DONE',
+    fail_occurs: 'OCCURS',
+    fail_clash: 'CLASH',
+    fail_arity: 'ARITY',
+    fail: 'FAIL'
+};
+
+function renderResult(r, t1, t2) {
+    const area = document.getElementById('uni-result');
+    const unified = r.unifiable;
+    const subst = r.substitution || [];
+    const steps = r.steps || [];
+
+    let html = '';
+
+    // Result banner
+    if (unified) {
+        html += `
+        <div class="unified-display">✓ Unified: <span>${r.unified_term}</span></div>
+
+        <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">σ</div> Most General Unifier (MGU)</div>
+                <span class="badge badge-success">${subst.length} binding${subst.length !== 1 ? 's' : ''}</span>
+            </div>
+            ${subst.length === 0
+                ? `<p style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary)">σ = {} (empty substitution — terms are already identical)</p>`
+                : subst.map(s => {
+                    const [varPart, termPart] = s.split(' ↦ ');
+                    return `<div class="subst-row">
+                        <span class="subst-var">${varPart}</span>
+                        <span class="subst-arrow">↦</span>
+                        <span class="subst-term">${termPart}</span>
+                    </div>`;
+                }).join('')}
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">✓</div> Verification</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-family:var(--font-mono);font-size:13px">
+                <div>
+                    <div style="color:var(--text-muted);font-size:11px;margin-bottom:4px">σ(Term 1)</div>
+                    <div style="background:var(--bg-input);border:1px solid var(--border);padding:8px 12px;border-radius:var(--radius-sm);color:var(--green)">${r.term1_after}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted);font-size:11px;margin-bottom:4px">σ(Term 2)</div>
+                    <div style="background:var(--bg-input);border:1px solid var(--border);padding:8px 12px;border-radius:var(--radius-sm);color:var(--green)">${r.term2_after}</div>
+                </div>
+            </div>
+        </div>`;
+    } else {
+        html += `
+        <div style="padding:16px 20px;border-radius:var(--radius-md);display:flex;align-items:center;gap:12px;
+            font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:16px;
+            background:var(--red-dim);border:1px solid rgba(255,92,122,0.3);color:var(--red)">
+            <span>✗</span><span>Terms are NOT unifiable</span>
+        </div>`;
+    }
+
+    // Step trace
+    html += `
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">≡</div> Unification Trace</div>
+            <span class="badge badge-info">${steps.length} step${steps.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="step-list">
+            ${steps.map((s, i) => {
+                const badgeCls = stepBadgeClass[s.type] || 'step-badge-init';
+                const label = stepLabel[s.type] || s.type.toUpperCase();
+                const delay = Math.min(i * 25, 500);
+                const isFail = s.type.startsWith('fail');
+                const isOk = s.type === 'result' || s.type === 'identical';
+
+                return `
+                <div class="step-item ${isFail ? 'step-reject' : isOk ? 'step-accept' : ''}"
+                     style="animation-delay:${delay}ms">
+                    <span class="step-badge ${badgeCls}">${label}</span>
+                    <div class="step-content">
+                        <strong>${s.description}</strong>
+                        ${s.subst_added ? `<br><span style="color:var(--accent);font-size:11px">Added: ${s.subst_added}</span>` : ''}
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+
+    area.innerHTML = html;
+}
+</script>
+{% endblock %}

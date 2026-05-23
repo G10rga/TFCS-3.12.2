@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+{% block title %}Automata Simulator — FormalCS{% endblock %}
+
+{% block extra_css %}
+<style>
+.type-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+.type-btn {
+    flex: 1; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--bg-input); color: var(--text-secondary); font-family: var(--font-body);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition); text-align:center;
+}
+.type-btn.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent-border); }
+
+#fa-graph svg { width: 100%; height: 100%; }
+.cytoscape-container {
+    width: 100%; height: 380px; background: var(--bg-code);
+    border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
+    position: relative;
+}
+
+/* Playback controls */
+.playback-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 12px;
+}
+.playback-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--bg-input);
+    color: var(--text-primary); cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition); flex-shrink: 0;
+}
+.playback-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
+.playback-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.playback-btn.play-pause { width: 38px; height: 38px; font-size: 15px; }
+
+.step-scrubber {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 2px; background: var(--border);
+    outline: none; cursor: pointer;
+}
+.step-scrubber::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px rgba(245,166,35,0.5);
+}
+.step-counter {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+    white-space: nowrap; min-width: 52px; text-align: right;
+}
+.speed-select {
+    font-family: var(--font-mono); font-size: 11px; padding: 4px 8px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    color: var(--text-secondary); border-radius: var(--radius-sm); cursor: pointer;
+}
+
+/* Step indicator strip */
+.step-strip {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--bg-code);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 12px; min-height: 44px; align-items: center;
+}
+.step-pip {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--bg-input);
+    font-family: var(--font-mono); font-size: 9px; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+}
+.step-pip:hover { border-color: var(--accent-border); color: var(--accent); }
+.step-pip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; box-shadow: 0 0 10px rgba(245,166,35,0.4); }
+.step-pip.visited { background: var(--blue-dim); border-color: rgba(91,159,255,0.4); color: var(--blue); }
+.step-pip.accepted { background: var(--green-dim); border-color: rgba(61,230,138,0.4); color: var(--green); }
+.step-pip.rejected { background: var(--red-dim); border-color: rgba(255,92,122,0.4); color: var(--red); }
+
+/* Current step description box */
+.step-desc-box {
+    padding: 12px 16px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 12px; min-height: 54px;
+    display: flex; align-items: center; gap: 12px;
+}
+.step-desc-symbol {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+    color: var(--accent); font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-desc-text {
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
+    line-height: 1.5;
+}
+.step-desc-text strong { color: var(--text-primary); }
+
+/* Accept/reject banner */
+.accept-banner {
+    padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 12px; display: flex;
+    align-items: center; gap: 10px; font-family: var(--font-display); font-size: 16px; font-weight: 700;
+}
+.accept-banner.accepted { background: var(--green-dim); border: 1px solid rgba(61,230,138,0.3); color: var(--green); }
+.accept-banner.rejected { background: var(--red-dim); border: 1px solid rgba(255,92,122,0.3); color: var(--red); }
+
+/* Input string display */
+.input-tape {
+    display: flex; gap: 3px; align-items: center; flex-wrap: wrap;
+    padding: 8px 14px; background: var(--bg-code);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 12px; min-height: 42px;
+}
+.tape-cell {
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg-input);
+    font-family: var(--font-mono); font-size: 14px; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; position: relative;
+}
+.tape-cell.current {
+    background: var(--accent-dim); border-color: var(--accent-border);
+    color: var(--accent); transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(245,166,35,0.3);
+}
+.tape-cell.read {
+    background: var(--blue-dim); border-color: rgba(91,159,255,0.3);
+    color: var(--blue);
+}
+.tape-cell.empty-sym {
+    color: var(--text-muted); font-size: 10px;
+    border-style: dashed;
+}
+
+.example-btn {
+    font-family: var(--font-mono); font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+    cursor: pointer; transition: all var(--transition);
+}
+.example-btn:hover { color: var(--text-primary); border-color: var(--accent-border); background: var(--accent-dim); }
+
+/* Graph overlay label */
+.graph-step-label {
+    position: absolute; top: 10px; right: 10px;
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);
+    background: rgba(10,10,15,0.8); padding: 4px 8px; border-radius: 6px;
+    border: 1px solid var(--border); pointer-events: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <span class="page-tag">Module 01</span>
+        <h1 class="page-title">Automata Simulator</h1>
+        <p class="page-subtitle">Define a DFA or NFA and simulate it on any input string with animated state traversal.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-start">
+        <span class="badge badge-info">DFA/NFA</span>
+        <span class="badge badge-purple">Animated</span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap:24px;align-items:start">
+    <!-- Input Panel -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-title-icon">⊙</div>
+                    Machine Configuration
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span>ℹ</span>
+                <span>Transitions format: <code>q0,a,q1;q0,b,q2;q1,a,q1</code> (semicolon-separated). For NFA with epsilon, use <code>ε</code>.</span>
+            </div>
+
+            <div class="type-toggle">
+                <button class="type-btn active" id="btn-dfa" onclick="setType('DFA')">DFA — Deterministic</button>
+                <button class="type-btn" id="btn-nfa" onclick="setType('NFA')">NFA — Non-deterministic</button>
+            </div>
+            <input type="hidden" id="fa-type" value="DFA">
+
+            <div class="form-group">
+                <label class="form-label">States <span class="required">*</span><span class="hint">comma-separated</span></label>
+                <input class="form-input" id="fa-states" placeholder="q0, q1, q2" value="q0, q1, q2">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Alphabet <span class="required">*</span><span class="hint">comma-separated</span></label>
+                <input class="form-input" id="fa-alphabet" placeholder="a, b" value="a, b">
+            </div>
+
+            <div class="grid-2" style="gap:12px">
+                <div class="form-group">
+                    <label class="form-label">Start State <span class="required">*</span></label>
+                    <input class="form-input" id="fa-start" placeholder="q0" value="q0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Accept States <span class="required">*</span></label>
+                    <input class="form-input" id="fa-accept" placeholder="q2" value="q2">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Transitions <span class="required">*</span></label>
+                <textarea class="form-textarea" id="fa-transitions" rows="3" placeholder="q0,a,q1;q0,b,q0;q1,a,q1;q1,b,q2;q2,a,q2;q2,b,q2">q0,a,q1;q0,b,q0;q1,a,q1;q1,b,q2;q2,a,q2;q2,b,q2</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Input String <span class="hint">to simulate</span></label>
+                <input class="form-input" id="fa-input" placeholder="aab" value="aab">
+            </div>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">Examples:</span>
+                <button class="example-btn" onclick="loadExample('dfa-even')">Even b's</button>
+                <button class="example-btn" onclick="loadExample('nfa-ab')">NFA: ends in ab</button>
+                <button class="example-btn" onclick="loadExample('dfa-binary')">Binary divisible 3</button>
+            </div>
+
+            <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" style="flex:1" id="btn-simulate" data-primary onclick="simulate()">
+                    ▶ Simulate
+                </button>
+                <button class="btn btn-ghost" onclick="visualizeOnly()">
+                    ◈ Draw Graph
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Panel -->
+    <div>
+        <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">◈</div> State Diagram</div>
+                <button class="btn btn-ghost btn-sm" onclick="refreshGraph()">↺ Refresh</button>
+            </div>
+
+            <!-- Graph container with overlay label -->
+            <div id="fa-graph" class="cytoscape-container">
+                <div class="empty-state">
+                    <div class="empty-icon">◈</div>
+                    <div class="empty-title">No diagram yet</div>
+                    <div class="empty-sub">Configure automaton and click Draw Graph or Simulate</div>
+                </div>
+                <div class="graph-step-label" id="graphStepLabel" style="display:none"></div>
+            </div>
+        </div>
+
+        <!-- Playback controls — only shown after simulation -->
+        <div id="playback-section" style="display:none">
+
+            <!-- Input tape -->
+            <div class="input-tape" id="inputTape"></div>
+
+            <!-- Playback bar -->
+            <div class="playback-bar">
+                <button class="playback-btn" id="btnFirst" onclick="goToStep(0)" title="First">⏮</button>
+                <button class="playback-btn" id="btnPrev" onclick="stepBackward()" title="Previous">◀</button>
+                <button class="playback-btn play-pause" id="btnPlay" onclick="togglePlay()" title="Play/Pause">▶</button>
+                <button class="playback-btn" id="btnNext" onclick="stepForward()" title="Next">▶</button>
+                <button class="playback-btn" id="btnLast" onclick="goToStep(totalSteps - 1)" title="Last">⏭</button>
+                <input type="range" class="step-scrubber" id="stepScrubber" min="0" value="0" oninput="goToStep(+this.value)">
+                <span class="step-counter" id="stepCounter">0 / 0</span>
+                <select class="speed-select" id="speedSelect" onchange="setSpeed(+this.value)">
+                    <option value="1200">0.5×</option>
+                    <option value="700" selected>1×</option>
+                    <option value="400">1.5×</option>
+                    <option value="220">2×</option>
+                    <option value="100">3×</option>
+                </select>
+            </div>
+
+            <!-- Step pip strip -->
+            <div class="step-strip" id="stepStrip"></div>
+
+            <!-- Current step description -->
+            <div class="step-desc-box" id="stepDescBox">
+                <div class="step-desc-symbol" id="stepSymbol">—</div>
+                <div class="step-desc-text" id="stepDescText">Waiting for playback…</div>
+            </div>
+
+            <!-- Final verdict -->
+            <div id="finalVerdict"></div>
+        </div>
+
+        <!-- Idle state when no simulation yet -->
+        <div id="result-idle">
+            <div class="empty-state" style="padding:32px">
+                <div class="empty-icon">⊙</div>
+                <div class="empty-title">Ready to simulate</div>
+                <div class="empty-sub">Configure machine and input string, then click Simulate</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<script>
+let cy = null;
+let currentType = 'DFA';
+let simulationSteps = [];
+let totalSteps = 0;
+let currentStep = -1;
+let playInterval = null;
+let playSpeed = 700;
+let simResult = null;
+let simFaType = null;
+
+// ─── Type toggle ─────────────────────────────────────────
+function setType(type) {
+    currentType = type;
+    document.getElementById('fa-type').value = type;
+    document.getElementById('btn-dfa').classList.toggle('active', type === 'DFA');
+    document.getElementById('btn-nfa').classList.toggle('active', type === 'NFA');
+}
+
+// ─── Examples ────────────────────────────────────────────
+const examples = {
+    'dfa-even': {
+        states: 'q0, q1', alphabet: 'a, b', start: 'q0', accept: 'q0',
+        transitions: 'q0,a,q0;q0,b,q1;q1,a,q1;q1,b,q0', input: 'abba', type: 'DFA'
+    },
+    'nfa-ab': {
+        states: 'q0, q1, q2', alphabet: 'a, b', start: 'q0', accept: 'q2',
+        transitions: 'q0,a,q0;q0,b,q0;q0,a,q1;q1,b,q2', input: 'aab', type: 'NFA'
+    },
+    'dfa-binary': {
+        states: 'q0, q1, q2', alphabet: '0, 1', start: 'q0', accept: 'q0',
+        transitions: 'q0,0,q0;q0,1,q1;q1,0,q2;q1,1,q0;q2,0,q1;q2,1,q2', input: '110', type: 'DFA'
+    }
+};
+
+function loadExample(key) {
+    const ex = examples[key];
+    if (!ex) return;
+    document.getElementById('fa-states').value = ex.states;
+    document.getElementById('fa-alphabet').value = ex.alphabet;
+    document.getElementById('fa-start').value = ex.start;
+    document.getElementById('fa-accept').value = ex.accept;
+    document.getElementById('fa-transitions').value = ex.transitions;
+    document.getElementById('fa-input').value = ex.input;
+    setType(ex.type);
+    showToast('Example loaded!', 'success', 2000);
+}
+
+function getFormData() {
+    return {
+        states: document.getElementById('fa-states').value,
+        alphabet: document.getElementById('fa-alphabet').value,
+        start_state: document.getElementById('fa-start').value,
+        accept_states: document.getElementById('fa-accept').value,
+        transitions: document.getElementById('fa-transitions').value,
+        input_string: document.getElementById('fa-input').value,
+        fa_type: document.getElementById('fa-type').value
+    };
+}
+
+// ─── Simulate ────────────────────────────────────────────
+async function simulate() {
+    const btn = document.getElementById('btn-simulate');
+    const data = getFormData();
+    const result = await apiCall('/api/automata/simulate', data, btn);
+    if (!result) return;
+    if (result.error) { showToast(result.error, 'error'); return; }
+
+    simResult = result.result;
+    simFaType = result.fa_type;
+
+    renderGraph(result.graph, null);  // draw clean graph first
+    initPlayback(result.result, data.input_string, result.fa_type);
+}
+
+async function visualizeOnly() {
+    const data = getFormData();
+    const result = await apiCall('/api/automata/graph', data);
+    if (!result) return;
+    if (result.error) { showToast(result.error, 'error'); return; }
+    renderGraph(result.graph, null);
+    document.getElementById('playback-section').style.display = 'none';
+    document.getElementById('result-idle').style.display = 'block';
+}
+
+function refreshGraph() { visualizeOnly(); }
+
+// ─── Graph rendering ─────────────────────────────────────
+function renderGraph(graph, _unused) {
+    const container = document.getElementById('fa-graph');
+    container.innerHTML = '';
+
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'graph-step-label';
+    labelDiv.id = 'graphStepLabel';
+    labelDiv.style.display = 'none';
+    container.appendChild(labelDiv);
+
+    const elements = [];
+    graph.nodes.forEach(node => {
+        elements.push({ data: { id: node.id, label: node.label, is_start: node.is_start, is_accept: node.is_accept } });
+    });
+    graph.edges.forEach(edge => {
+        elements.push({ data: { id: edge.id, source: edge.source, target: edge.target, label: edge.label } });
+    });
+
+    cy = cytoscape({
+        container: container,
+        elements: elements,
+        layout: { name: 'cose', padding: 48, nodeRepulsion: 9000, idealEdgeLength: 110, animate: false },
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'background-color': '#16161e',
+                    'border-color': '#444458',
+                    'border-width': 2,
+                    'label': 'data(label)',
+                    'color': '#e8e8f0',
+                    'text-valign': 'center', 'text-halign': 'center',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': '12px',
+                    'width': 46, 'height': 46,
+                    'transition-property': 'background-color, border-color, border-width',
+                    'transition-duration': '0.25s'
+                }
+            },
+            {
+                selector: 'node[?is_accept]',
+                style: { 'border-color': '#3de68a', 'border-width': 3, 'background-color': 'rgba(61,230,138,0.07)' }
+            },
+            {
+                selector: 'node[?is_start]',
+                style: { 'border-color': '#f5a623', 'border-width': 3, 'background-color': 'rgba(245,166,35,0.07)' }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'curve-style': 'bezier',
+                    'line-color': '#2c2c3e',
+                    'target-arrow-color': '#2c2c3e',
+                    'target-arrow-shape': 'triangle',
+                    'label': 'data(label)',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': '11px',
+                    'color': '#66667a',
+                    'text-background-color': '#0a0a0f',
+                    'text-background-opacity': 1,
+                    'text-background-padding': '2px',
+                    'width': 1.5,
+                    'transition-property': 'line-color, target-arrow-color, width',
+                    'transition-duration': '0.25s'
+                }
+            },
+            {
+                selector: '.active-node',
+                style: {
+                    'background-color': 'rgba(245,166,35,0.25)',
+                    'border-color': '#f5a623',
+                    'border-width': 4,
+                    'color': '#f5a623'
+                }
+            },
+            {
+                selector: '.visited-node',
+                style: {
+                    'background-color': 'rgba(91,159,255,0.12)',
+                    'border-color': '#5b9fff',
+                    'border-width': 3
+                }
+            },
+            {
+                selector: '.active-edge',
+                style: {
+                    'line-color': '#f5a623',
+                    'target-arrow-color': '#f5a623',
+                    'width': 3,
+                    'color': '#f5a623'
+                }
+            },
+            {
+                selector: '.visited-edge',
+                style: {
+                    'line-color': 'rgba(91,159,255,0.5)',
+                    'target-arrow-color': 'rgba(91,159,255,0.5)',
+                    'width': 2
+                }
+            },
+            {
+                selector: '.accept-node',
+                style: {
+                    'background-color': 'rgba(61,230,138,0.25)',
+                    'border-color': '#3de68a',
+                    'border-width': 4,
+                    'color': '#3de68a'
+                }
+            },
+            {
+                selector: '.reject-node',
+                style: {
+                    'background-color': 'rgba(255,92,122,0.2)',
+                    'border-color': '#ff5c7a',
+                    'border-width': 4,
+                    'color': '#ff5c7a'
+                }
+            }
+        ]
+    });
+}
+
+function initPlayback(result, inputString, faType) {
+    stopPlay();
+
+    simulationSteps = result.steps;
+    totalSteps = simulationSteps.length;
+    currentStep = -1;
+
+    document.getElementById('playback-section').style.display = 'block';
+    document.getElementById('result-idle').style.display = 'none';
+
+    buildTape(inputString);
+
+    buildPips(result);
+
+    const scrubber = document.getElementById('stepScrubber');
+    scrubber.max = totalSteps - 1;
+    scrubber.value = 0;
+
+    const verdict = document.getElementById('finalVerdict');
+    verdict.innerHTML = `
+        <div class="accept-banner ${result.accepted ? 'accepted' : 'rejected'}">
+            <span>${result.accepted ? '✓' : '✗'}</span>
+            <span>String will be ${result.accepted ? 'ACCEPTED' : 'REJECTED'} — ${faType}</span>
+        </div>
+    `;
+
+    goToStep(0);
+    autoPlay();
+}
+
+function buildTape(str) {
+    const tape = document.getElementById('inputTape');
+    tape.innerHTML = '';
+    if (!str) {
+        const cell = document.createElement('div');
+        cell.className = 'tape-cell empty-sym'; cell.textContent = 'ε';
+        tape.appendChild(cell);
+        return;
+    }
+    for (let i = 0; i < str.length; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'tape-cell';
+        cell.id = `tape-${i}`;
+        cell.textContent = str[i];
+        tape.appendChild(cell);
+    }
+}
+
+function buildPips(result) {
+    const strip = document.getElementById('stepStrip');
+    strip.innerHTML = '';
+    result.steps.forEach((step, i) => {
+        const pip = document.createElement('div');
+        pip.className = 'step-pip';
+        pip.id = `pip-${i}`;
+        pip.textContent = i;
+        pip.title = step.description;
+        pip.onclick = () => { stopPlay(); goToStep(i); };
+        strip.appendChild(pip);
+    });
+}
+
+function goToStep(idx) {
+    if (!cy || simulationSteps.length === 0) return;
+    idx = Math.max(0, Math.min(idx, totalSteps - 1));
+    currentStep = idx;
+
+    document.getElementById('stepScrubber').value = idx;
+    document.getElementById('stepCounter').textContent = `${idx + 1} / ${totalSteps}`;
+
+    cy.nodes().removeClass('active-node visited-node accept-node reject-node');
+    cy.edges().removeClass('active-edge visited-edge');
+
+    const step = simulationSteps[idx];
+    const isLast = idx === totalSteps - 1;
+
+    const visitedNodes = new Set();
+    const visitedEdgePairs = []; // [{from, to, symbol}]
+
+    for (let i = 0; i < idx; i++) {
+        const s = simulationSteps[i];
+        (s.current_states || []).forEach(n => visitedNodes.add(n));
+        if (i > 0 && simulationSteps[i - 1].current_states && s.symbol_read) {
+            const prevStates = simulationSteps[i - 1].current_states;
+            const curStates = s.current_states;
+            visitedEdgePairs.push({ from: prevStates, to: curStates, symbol: s.symbol_read });
+        }
+    }
+
+    visitedNodes.forEach(n => {
+        const node = cy.getElementById(n);
+        if (node.length) node.addClass('visited-node');
+    });
+
+    visitedEdgePairs.forEach(({ from, to, symbol }) => {
+        from.forEach(f => {
+            to.forEach(t => {
+                cy.edges().forEach(e => {
+                    if (e.data('source') === f && e.data('target') === t) {
+                        const edgeLabel = e.data('label') || '';
+                        if (edgeLabel.split(',').map(s => s.trim()).includes(symbol)) {
+                            e.addClass('visited-edge');
+                        }
+                    }
+                });
+            });
+        });
+    });
+
+    if (idx > 0 && step.symbol_read) {
+        const prevStates = simulationSteps[idx - 1].current_states || [];
+        const curStates = step.current_states || [];
+        prevStates.forEach(f => {
+            curStates.forEach(t => {
+                cy.edges().forEach(e => {
+                    if (e.data('source') === f && e.data('target') === t) {
+                        const edgeLabel = e.data('label') || '';
+                        if (edgeLabel.split(',').map(s => s.trim()).includes(step.symbol_read)) {
+                            e.removeClass('visited-edge').addClass('active-edge');
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    if (isLast) {
+        const cls = simResult.accepted ? 'accept-node' : 'reject-node';
+        (step.current_states || []).forEach(n => {
+            const node = cy.getElementById(n);
+            if (node.length) node.removeClass('visited-node').addClass(cls);
+        });
+    } else {
+        (step.current_states || []).forEach(n => {
+            const node = cy.getElementById(n);
+            if (node.length) node.removeClass('visited-node').addClass('active-node');
+        });
+    }
+
+    document.querySelectorAll('.step-pip').forEach((pip, i) => {
+        pip.classList.remove('active', 'visited', 'accepted', 'rejected');
+        if (i < idx) pip.classList.add('visited');
+        else if (i === idx) {
+            if (isLast) pip.classList.add(simResult.accepted ? 'accepted' : 'rejected');
+            else pip.classList.add('active');
+        }
+    });
+
+    const symbolIdx = idx - 1; // which character was just read
+    document.querySelectorAll('.tape-cell').forEach((cell, i) => {
+        cell.classList.remove('current', 'read');
+        if (i < symbolIdx) cell.classList.add('read');
+        else if (i === symbolIdx) cell.classList.add('current');
+    });
+
+    const symbol = step.symbol_read || (idx === 0 ? 'start' : '—');
+    document.getElementById('stepSymbol').textContent = step.symbol_read || (idx === 0 ? '▶' : '—');
+    document.getElementById('stepDescText').innerHTML = `<strong>${step.description}</strong><br>
+        <span>Active states: {${(step.current_states || []).join(', ') || '∅'}}</span>
+        ${step.remaining_input !== undefined && step.remaining_input !== '' ? `<span style="margin-left:10px">Remaining: "${step.remaining_input}"</span>` : ''}
+    `;
+
+    const lbl = document.getElementById('graphStepLabel');
+    lbl.style.display = 'block';
+    lbl.textContent = `Step ${idx} / ${totalSteps - 1}`;
+
+    updatePlaybackBtns();
+}
+
+function stepForward() {
+    if (currentStep < totalSteps - 1) goToStep(currentStep + 1);
+    else stopPlay();
+}
+
+function stepBackward() {
+    stopPlay();
+    if (currentStep > 0) goToStep(currentStep - 1);
+}
+
+function togglePlay() {
+    if (playInterval) stopPlay();
+    else autoPlay();
+}
+
+function autoPlay() {
+    if (currentStep >= totalSteps - 1) goToStep(0);
+    document.getElementById('btnPlay').textContent = '⏸';
+    playInterval = setInterval(() => {
+        if (currentStep >= totalSteps - 1) { stopPlay(); return; }
+        goToStep(currentStep + 1);
+    }, playSpeed);
+}
+
+function stopPlay() {
+    if (playInterval) { clearInterval(playInterval); playInterval = null; }
+    document.getElementById('btnPlay').textContent = '▶';
+}
+
+function setSpeed(ms) {
+    playSpeed = ms;
+    if (playInterval) { stopPlay(); autoPlay(); }
+}
+
+function updatePlaybackBtns() {
+    document.getElementById('btnPrev').disabled = currentStep <= 0;
+    document.getElementById('btnFirst').disabled = currentStep <= 0;
+    document.getElementById('btnNext').disabled = currentStep >= totalSteps - 1;
+    document.getElementById('btnLast').disabled = currentStep >= totalSteps - 1;
+}
+</script>
+{% endblock %}

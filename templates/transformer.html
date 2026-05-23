@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% block title %}Formula Transformer — FormalCS{% endblock %}
+
+{% block extra_css %}
+<style>
+.transform-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px; margin-bottom: 12px;
+    transition: all var(--transition);
+}
+.transform-card:hover { border-color: var(--border-hover); }
+.transform-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+}
+.transform-name {
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    color: var(--text-primary); display: flex; align-items: center; gap: 8px;
+}
+.result-formula {
+    font-family: var(--font-mono); font-size: 14px; color: var(--accent);
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm); padding: 10px 14px; word-break: break-all;
+    line-height: 1.7; cursor: pointer;
+}
+.result-formula:hover { background: rgba(245,166,35,0.2); }
+
+.truth-table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.truth-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--font-mono); }
+.truth-table th { background: var(--bg-card); padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 500; letter-spacing: 0.06em; }
+.truth-table td { padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+.truth-table tr:last-child td { border-bottom: none; }
+.truth-table tr:hover td { background: var(--bg-card); }
+.tt-true { color: var(--green); font-weight: 700; }
+.tt-false { color: var(--red); }
+.tt-result-true { background: var(--green-dim) !important; color: var(--green) !important; font-weight: 700; }
+.tt-result-false { background: var(--red-dim) !important; color: var(--red) !important; }
+
+.step-rule {
+    display: inline-block; background: var(--blue-dim); border: 1px solid rgba(91,159,255,0.2);
+    color: var(--blue); font-family: var(--font-mono); font-size: 10px; padding: 2px 8px;
+    border-radius: 20px; margin-left: 8px;
+}
+.clause-pill {
+    display: inline-flex; padding: 3px 10px; border-radius: 20px; font-family: var(--font-mono);
+    font-size: 11px; background: var(--red-dim); border: 1px solid rgba(255,92,122,0.2);
+    color: var(--red); margin: 3px;
+}
+.dnf-pill {
+    display: inline-flex; padding: 3px 10px; border-radius: 20px; font-family: var(--font-mono);
+    font-size: 11px; background: var(--blue-dim); border: 1px solid rgba(91,159,255,0.2);
+    color: var(--blue); margin: 3px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <span class="page-tag">Module 04</span>
+        <h1 class="page-title">Formula Transformer</h1>
+        <p class="page-subtitle">Convert any propositional logic formula to NNF, CNF, and DNF with complete step-by-step derivations and truth table verification.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <span class="badge badge-info">NNF · CNF · DNF</span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap:24px;align-items:start">
+    <!-- Input -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><div class="card-title-icon">⟺</div> Formula Input</div>
+            </div>
+
+            <div class="info-box">
+                <span>ℹ</span>
+                <div style="line-height:1.8">
+                    Operators: <code>~</code> <code>&</code> <code>|</code> <code>-></code> <code>&lt;-></code><br>
+                    Variables: any lowercase identifiers: <code>p</code>, <code>q</code>, <code>r</code>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Formula <span class="required">*</span></label>
+                <input class="form-input" id="tf-formula" value="(p -> q) & (q -> r) -> (p -> r)"
+                    placeholder="(p -> q) & ~p" style="font-size:15px;padding:12px 14px">
+            </div>
+
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <button class="sym-btn" onclick="ins('~')">¬</button>
+                <button class="sym-btn" onclick="ins(' & ')">∧</button>
+                <button class="sym-btn" onclick="ins(' | ')">∨</button>
+                <button class="sym-btn" onclick="ins(' -> ')">→</button>
+                <button class="sym-btn" onclick="ins(' <-> ')">↔</button>
+                <button class="sym-btn" onclick="ins('(')"> ( </button>
+                <button class="sym-btn" onclick="ins(')')"> ) </button>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center">Examples:</span>
+                <button class="ex-btn" onclick="loadEx('(p -> q) & (q -> r) -> (p -> r)')">Hypothetical Syllogism</button>
+                <button class="ex-btn" onclick="loadEx('p <-> ~p')">Contradiction</button>
+                <button class="ex-btn" onclick="loadEx('(p | q) & (~p | r) & (~q | ~r)')">3-Clause</button>
+                <button class="ex-btn" onclick="loadEx('~(p & q) <-> (~p | ~q)')">De Morgan</button>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%" id="btn-transform" data-primary onclick="transform()">
+                ⟺ Transform Formula
+            </button>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="tf-result">
+        <div class="empty-state" style="padding:48px 24px">
+            <div class="empty-icon">⟺</div>
+            <div class="empty-title">Awaiting formula</div>
+            <div class="empty-sub">Enter a formula to see NNF, CNF, DNF transformations and truth table</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.sym-btn, .ex-btn {
+    font-family:var(--font-mono);font-size:12px;padding:5px 11px;border-radius:var(--radius-sm);
+    border:1px solid var(--border);background:var(--bg-input);color:var(--text-secondary);
+    cursor:pointer;transition:all var(--transition);
+}
+.sym-btn:hover, .ex-btn:hover { color:var(--accent);border-color:var(--accent-border); }
+.ex-btn { font-size:11px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function ins(s) {
+    const inp = document.getElementById('tf-formula');
+    const st = inp.selectionStart, en = inp.selectionEnd;
+    inp.value = inp.value.slice(0, st) + s + inp.value.slice(en);
+    inp.selectionStart = inp.selectionEnd = st + s.length;
+    inp.focus();
+}
+function loadEx(f) {
+    document.getElementById('tf-formula').value = f;
+    showToast('Example loaded!', 'success', 2000);
+}
+
+async function transform() {
+    const btn = document.getElementById('btn-transform');
+    const formula = document.getElementById('tf-formula').value.trim();
+    if (!formula) { showToast('Please enter a formula', 'error'); return; }
+    const result = await apiCall('/api/transformer/transform', { formula }, btn);
+    if (!result) return;
+    if (result.error) { showToast(result.error, 'error'); return; }
+    renderResult(result);
+}
+
+function renderResult(r) {
+    const tt = r.truth_table;
+    const vars = tt.variables;
+
+    // Classification badges
+    let classif = '';
+    if (tt.is_tautology) classif = '<span class="badge badge-success">Tautology</span>';
+    else if (tt.is_contradiction) classif = '<span class="badge badge-error">Contradiction</span>';
+    else if (tt.is_satisfiable) classif = '<span class="badge badge-warning">Satisfiable</span>';
+    else classif = '<span class="badge badge-error">Unsatisfiable</span>';
+
+    let html = `
+    <!-- Original -->
+    <div class="transform-card" style="border-color:var(--accent-border)">
+        <div class="transform-card-header">
+            <div class="transform-name">
+                <span style="font-family:var(--font-mono);font-size:11px;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);padding:2px 8px;border-radius:20px">ORIGINAL</span>
+            </div>
+            ${classif}
+        </div>
+        <div class="result-formula" onclick="copyText('${r.original.replace(/'/g,"\\'")}')">
+            ${highlightFormula(r.original)}
+        </div>
+    </div>
+
+    <!-- NNF -->
+    <div class="transform-card">
+        <div class="transform-card-header">
+            <div class="transform-name">
+                <span style="font-family:var(--font-mono);font-size:11px;background:var(--blue-dim);border:1px solid rgba(91,159,255,0.2);color:var(--blue);padding:2px 8px;border-radius:20px">NNF</span>
+                Negation Normal Form
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleSteps('nnf-steps')">Steps</button>
+        </div>
+        <div class="result-formula" onclick="copyText('${r.nnf.result.replace(/'/g,"\\'")}')">
+            ${highlightFormula(r.nnf.result)}
+        </div>
+        <div id="nnf-steps" style="display:none;margin-top:12px">
+            <div class="step-list">
+                ${r.nnf.steps.map((s, i) => `
+                <div class="step-item" style="animation-delay:${i*30}ms">
+                    <div class="step-num">${i}</div>
+                    <div class="step-content">
+                        <strong>${s.description}</strong>
+                        ${s.rule ? `<span class="step-rule">${s.rule}</span>` : ''}
+                        <br><span style="color:var(--accent)">${s.formula}</span>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </div>
+
+    <!-- CNF -->
+    <div class="transform-card">
+        <div class="transform-card-header">
+            <div class="transform-name">
+                <span style="font-family:var(--font-mono);font-size:11px;background:var(--red-dim);border:1px solid rgba(255,92,122,0.2);color:var(--red);padding:2px 8px;border-radius:20px">CNF</span>
+                Conjunctive Normal Form
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleSteps('cnf-steps')">Steps</button>
+        </div>
+        <div class="result-formula" onclick="copyText('${r.cnf.result.replace(/'/g,"\\'")}')">
+            ${highlightFormula(r.cnf.result)}
+        </div>
+        <div id="cnf-steps" style="display:none;margin-top:12px">
+            <div class="step-list">
+                ${r.cnf.steps.map((s, i) => `
+                <div class="step-item" style="animation-delay:${i*30}ms">
+                    <div class="step-num">${i}</div>
+                    <div class="step-content">
+                        <strong>${s.description}</strong>
+                        ${s.rule ? `<span class="step-rule">${s.rule}</span>` : ''}
+                        <br><span style="color:var(--accent)">${s.formula}</span>
+                    </div>
+                </div>`).join('')}
+            </div>
+            ${r.cnf.clauses && r.cnf.clauses.length > 0 ? `
+            <div style="margin-top:12px">
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Clause Set</div>
+                <div>${r.cnf.clauses.map((c, i) => `<span class="clause-pill">C${i+1}: ${c}</span>`).join('')}</div>
+            </div>` : ''}
+        </div>
+    </div>
+
+    <!-- DNF -->
+    <div class="transform-card">
+        <div class="transform-card-header">
+            <div class="transform-name">
+                <span style="font-family:var(--font-mono);font-size:11px;background:var(--green-dim);border:1px solid rgba(61,230,138,0.2);color:var(--green);padding:2px 8px;border-radius:20px">DNF</span>
+                Disjunctive Normal Form
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleSteps('dnf-steps')">Steps</button>
+        </div>
+        <div class="result-formula" onclick="copyText('${r.dnf.result.replace(/'/g,"\\'")}')">
+            ${highlightFormula(r.dnf.result)}
+        </div>
+        <div id="dnf-steps" style="display:none;margin-top:12px">
+            <div class="step-list">
+                ${r.dnf.steps.map((s, i) => `
+                <div class="step-item" style="animation-delay:${i*30}ms">
+                    <div class="step-num">${i}</div>
+                    <div class="step-content">
+                        <strong>${s.description}</strong>
+                        ${s.rule ? `<span class="step-rule">${s.rule}</span>` : ''}
+                        <br><span style="color:var(--accent)">${s.formula}</span>
+                    </div>
+                </div>`).join('')}
+            </div>
+            ${r.dnf.terms && r.dnf.terms.length > 0 ? `
+            <div style="margin-top:12px">
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Minterms</div>
+                <div>${r.dnf.terms.map((t, i) => `<span class="dnf-pill">m${i}: ${t}</span>`).join('')}</div>
+            </div>` : ''}
+        </div>
+    </div>
+
+    <!-- Truth Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">⊤</div> Truth Table</div>
+            <span class="badge badge-info">${Math.pow(2, vars.length)} rows</span>
+        </div>
+        <div class="truth-table-wrap">
+            <table class="truth-table">
+                <thead>
+                    <tr>
+                        ${vars.map(v => `<th>${v}</th>`).join('')}
+                        <th style="color:var(--accent)">Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tt.rows.map(row => `
+                    <tr>
+                        ${row.values.map(v => `<td class="${v ? 'tt-true' : 'tt-false'}">${v ? 'T' : 'F'}</td>`).join('')}
+                        <td class="${row.result ? 'tt-result-true' : 'tt-result-false'}">${row.result ? 'T' : 'F'}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+
+    document.getElementById('tf-result').innerHTML = html;
+}
+
+function toggleSteps(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function highlightFormula(f) {
+    return f
+        .replace(/¬/g, '<span style="color:var(--red)">¬</span>')
+        .replace(/∧/g, '<span style="color:var(--blue)">∧</span>')
+        .replace(/∨/g, '<span style="color:var(--green)">∨</span>')
+        .replace(/→/g, '<span style="color:var(--accent)">→</span>')
+        .replace(/↔/g, '<span style="color:var(--purple)">↔</span>');
+}
+</script>
+{% endblock %}
