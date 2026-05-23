@@ -86,19 +86,6 @@ Uses BFS over sentential forms with leftmost variable expansion. Sentential form
 - **CNF:** NNF + distribute ∨ over ∧ recursively
 - **DNF:** NNF + distribute ∧ over ∨ recursively
 
-### Robinson's Unification (1965)
-```
-unify(t1, t2, σ):
-  t1' = σ(t1), t2' = σ(t2)
-  if t1' = t2': return σ
-  if t1' is variable X not in vars(t2'): return σ ∘ {X ↦ t2'}
-  if t2' is variable Y not in vars(t1'): return σ ∘ {Y ↦ t1'}
-  if both functions f(s₁…sₙ) and f(t₁…tₙ):
-    σ₀ = σ
-    for i = 1..n: σᵢ = unify(sᵢ, tᵢ, σᵢ₋₁)
-    return σₙ
-  fail (clash or arity mismatch)
-```
 
 ---
 
