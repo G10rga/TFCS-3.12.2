@@ -24,7 +24,7 @@ formal_methods_platform/
 ├── app.py                   # Flask application + all REST API routes
 ├── requirements.txt
 ├── README.md
-├── algorithms/              # Pure Python computation (NO JS here)
+├── algorithms/              # Pure Python computation 
 │   ├── automata.py          # DFA/NFA: transitions, ε-closure, acceptance
 │   ├── resolution.py        # Parser, AST transforms, clause resolution
 │   └── transformer.py       # NNF/CNF/DNF transforms, truth table
@@ -34,6 +34,7 @@ formal_methods_platform/
 │   ├── automata.html        # DFA/NFA simulator page
 │   ├── resolution.html      # Resolution solver page
 │   ├── transformer.html     # Formula transformer page
+│   ├── welcome.html         # Welcome / Presentation page
 │   └── about.html           # Documentation
 └── static/
     ├── css/main.css         # Complete design system (CSS variables, components)
