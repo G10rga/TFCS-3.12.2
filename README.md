@@ -1,5 +1,5 @@
 [README.md](https://github.com/user-attachments/files/28174373/README.md)
-# FormalCS Platform
+# Theoretical Foundations of Computer Science Platform By G1orga
 
 **A full-stack interactive formal methods toolkit** built with Python (Flask) backend and a modern dark-themed frontend. All computational logic runs server-side in Python; JavaScript handles only UI rendering and asynchronous requests.
 
