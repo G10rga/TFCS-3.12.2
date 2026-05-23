@@ -12,10 +12,14 @@ app.config['JSON_AS_ASCII'] = False
 
 
 # ─── Page Routes ───────────────────────────────────────────────────────────
+@app.route('/index')
+def welcome():
+    return render_template('index.html')
+
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('welcome.html')
 
 
 @app.route('/automata')
