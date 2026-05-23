@@ -108,11 +108,9 @@ Example: `q0,a,q1;q0,b,q0;q1,a,q2`
 ---
 
 ## Demo Walkthrough
-
-1. **Dashboard** `/` — Module overview and quick-start links
-2. **Automata** `/automata` — Load "Binary divisible 3" example, click Simulate, observe graph + trace
-3. **CFG** `/cfg` — Load "Balanced ab" example, generate strings, click a string chip to see derivation
+1. **Dashboard** `/` — Welcome / Presentation of the website in general
+2. **Dashboard** `/index` — Module overview and quick-start links
+3. **Automata** `/automata` — Load "Binary divisible 3" example, click Simulate, observe graph + trace
 4. **Resolution** `/resolution` — Enter `(p -> q) & (~q) & p`, solve — proves UNSATISFIABLE via empty clause
 5. **Transformer** `/transformer` — Enter `p | ~p`, transform — identified as Tautology, all normal forms shown
-6. **Unification** `/unification` — Enter `f(X, g(Y))` and `f(a, g(b))`, unify — MGU = {X↦a, Y↦b}
-7. **About** `/about` — Full documentation, API reference, installation guide
+6. **About** `/about` — Full documentation, API reference, installation guide
