@@ -7,15 +7,13 @@
 
 ## Project Overview
 
-FormalCS Platform is a university-grade web application implementing five formal computer science modules in one cohesive interface:
+TFCS Platform is web application implementing three formal computer science modules in one cohesive interface:
 
 | Module | Description |
 |--------|-------------|
 | **Automata Simulator** | DFA/NFA simulation with step-by-step trace and Cytoscape.js graph |
-| **CFG Generator** | BFS-based string generation and recursive membership checking |
 | **Resolution Solver** | Propositional resolution with CNF conversion and proof visualization |
 | **Formula Transformer** | NNF, CNF, DNF transformations + truth table generation |
-| **Unification Solver** | Robinson's algorithm with full MGU computation and occurs check |
 
 ---
 
@@ -27,20 +25,15 @@ formal_methods_platform/
 ├── requirements.txt
 ├── README.md
 ├── algorithms/              # Pure Python computation (NO JS here)
-│   ├── __init__.py
 │   ├── automata.py          # DFA/NFA: transitions, ε-closure, acceptance
-│   ├── cfg.py               # CFG: BFS generation, membership, derivation
 │   ├── resolution.py        # Parser, AST transforms, clause resolution
-│   ├── transformer.py       # NNF/CNF/DNF transforms, truth table
-│   └── unification.py       # Robinson's algorithm, term parser, MGU
+│   └── transformer.py       # NNF/CNF/DNF transforms, truth table
 ├── templates/               # Jinja2 HTML (extend base.html)
 │   ├── base.html            # Sidebar nav, toast system, shared layout
 │   ├── index.html           # Dashboard
 │   ├── automata.html        # DFA/NFA simulator page
-│   ├── cfg.html             # CFG generator page
 │   ├── resolution.html      # Resolution solver page
 │   ├── transformer.html     # Formula transformer page
-│   ├── unification.html     # Unification solver page
 │   └── about.html           # Documentation
 └── static/
     ├── css/main.css         # Complete design system (CSS variables, components)
@@ -58,123 +51,13 @@ formal_methods_platform/
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| Backend | Python 3.10+ | All algorithms and computation |
-| Framework | Flask 3.x | HTTP server, routing, JSON API |
+| Backend | Python 3.13+ | All algorithms and computation |
+| Framework | Flask 3.1.3 | HTTP server, routing, JSON API |
 | Templating | Jinja2 | HTML template inheritance |
 | Graph Viz | Cytoscape.js 3.28 | Automata state diagrams |
 | Frontend | Vanilla JS | fetch API, DOM rendering, UI |
 | Styling | CSS Custom Properties | Full design system, responsive |
 | Fonts | Syne + JetBrains Mono | Display + monospace typography |
-
----
-
-## Installation
-
-### Requirements
-- Python 3.10 or higher
-- pip
-
-### Steps
-
-```bash
-# 1. Navigate to the project directory
-cd formal_methods_platform
-
-# 2. Create a virtual environment
-python -m venv venv
-
-# 3. Activate the virtual environment
-# On Linux/macOS:
-source venv/bin/activate
-# On Windows:
-venv\Scripts\activate
-
-# 4. Install dependencies
-pip install -r requirements.txt
-
-# 5. Run the application
-python app.py
-
-# 6. Open in your browser
-# http://localhost:5000
-```
-
----
-
-## API Reference
-
-All endpoints accept and return JSON. Use `Content-Type: application/json`.
-
-### POST `/api/automata/simulate`
-Simulate a finite automaton on an input string.
-
-**Request:**
-```json
-{
-  "states": "q0, q1, q2",
-  "alphabet": "a, b",
-  "start_state": "q0",
-  "accept_states": "q2",
-  "transitions": "q0,a,q1;q1,b,q2",
-  "input_string": "ab",
-  "fa_type": "DFA"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "result": {
-    "accepted": true,
-    "steps": [...],
-    "final_states": ["q2"]
-  },
-  "graph": { "nodes": [...], "edges": [...] }
-}
-```
-
-### POST `/api/automata/graph`
-Get graph data only (no simulation). Same request body, returns `{ graph }`.
-
-### POST `/api/cfg/generate`
-Generate strings from a context-free grammar.
-
-**Request:**
-```json
-{
-  "variables": "S",
-  "terminals": "a, b",
-  "start": "S",
-  "productions": "S -> a S b | ε",
-  "max_length": 6,
-  "count": 10
-}
-```
-
-### POST `/api/cfg/check`
-Check if a string is in L(G). Add `"test_string": "aabb"` to CFG request body.
-
-### POST `/api/resolution/solve`
-Apply resolution to a propositional formula.
-
-**Request:** `{ "formula": "(p -> q) & (~q) & p" }`
-
-**Response includes:** `original`, `nnf`, `cnf`, `clauses`, `proof` (steps, satisfiable, conclusion).
-
-### POST `/api/transformer/transform`
-Transform formula to NNF, CNF, DNF with truth table.
-
-**Request:** `{ "formula": "p -> q" }`
-
-**Response includes:** `nnf`, `cnf`, `dnf` (each with `result`, `steps`, clauses/terms), `truth_table`.
-
-### POST `/api/unification/unify`
-Unify two first-order logic terms.
-
-**Request:** `{ "term1": "f(X, g(Y))", "term2": "f(a, g(b))" }`
-
-**Response includes:** `unifiable`, `substitution`, `unified_term`, `steps`.
 
 ---
 
@@ -233,17 +116,6 @@ unify(t1, t2, σ):
 Format: `from_state,symbol,to_state` separated by semicolons.
 Example: `q0,a,q1;q0,b,q0;q1,a,q2`
 
-### CFG Productions
-One production per line. Alternatives separated by `|`. Use `ε` for empty.
-```
-S -> a S b | ε
-A -> a A | a
-```
-
-### Unification Terms
-- Variables: start with uppercase `X`, `Y`, `Var`
-- Constants: lowercase `a`, `b`, `john`
-- Functions: `f(X, a)`, `g(X, Y, Z)`
 
 ---
 
