@@ -8,43 +8,44 @@ from algorithms.transformer import get_all_transforms
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
+app.config["JSON_AS_ASCII"] = False
 
 
-# ─── Page Routes ───────────────────────────────────────────────────────────
-@app.route('/index')
+# Page Routes
+@app.route("/index")
 def welcome():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('welcome.html')
+    return render_template("welcome.html")
 
 
-@app.route('/automata')
+@app.route("/automata")
 def automata():
-    return render_template('automata.html')
+    return render_template("automata.html")
 
 
-@app.route('/resolution')
+@app.route("/resolution")
 def resolution():
-    return render_template('resolution.html')
+    return render_template("resolution.html")
 
 
-@app.route('/transformer')
+@app.route("/transformer")
 def transformer():
-    return render_template('transformer.html')
+    return render_template("transformer.html")
 
 
-@app.route('/about')
+@app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template("about.html")
 
 
-# ─── API Routes ────────────────────────────────────────────────────────────
+# API Routes
 
-@app.route('/api/automata/simulate', methods=['POST'])
+
+@app.route("/api/automata/simulate", methods=["POST"])
 def api_automata_simulate():
     """Simulate finite automaton on input string."""
     data = request.get_json()
@@ -63,17 +64,14 @@ def api_automata_simulate():
         result = fa.simulate(input_string)
         graph = fa.get_graph_data()
 
-        return jsonify({
-            "success": True,
-            "result": result,
-            "graph": graph,
-            "fa_type": fa.fa_type
-        })
+        return jsonify(
+            {"success": True, "result": result, "graph": graph, "fa_type": fa.fa_type}
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/automata/graph', methods=['POST'])
+@app.route("/api/automata/graph", methods=["POST"])
 def api_automata_graph():
     """Get graph data for automaton visualization only (no simulation)."""
     data = request.get_json()
@@ -92,7 +90,7 @@ def api_automata_graph():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/pda/simulate', methods=['POST'])
+@app.route("/api/pda/simulate", methods=["POST"])
 def api_pda_simulate():
     """Simulate pushdown automaton on input string."""
     data = request.get_json()
@@ -112,7 +110,7 @@ def api_pda_simulate():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/pda/graph', methods=['POST'])
+@app.route("/api/pda/graph", methods=["POST"])
 def api_pda_graph():
     """Get PDA graph data only."""
     data = request.get_json()
@@ -130,7 +128,7 @@ def api_pda_graph():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/resolution/solve', methods=['POST'])
+@app.route("/api/resolution/solve", methods=["POST"])
 def api_resolution_solve():
     """Apply resolution method to formula."""
     data = request.get_json()
@@ -149,7 +147,7 @@ def api_resolution_solve():
     return jsonify(result)
 
 
-@app.route('/api/transformer/transform', methods=['POST'])
+@app.route("/api/transformer/transform", methods=["POST"])
 def api_transformer_transform():
     """Transform formula to NNF, CNF, DNF."""
     data = request.get_json()
@@ -168,5 +166,47 @@ def api_transformer_transform():
     return jsonify(result)
 
 
-if __name__ == '__main__':
+# ─── AI Explainer Route ────────────────────────────────────────────────────
+
+from flask import Response, stream_with_context
+from algorithms.ai_explainer import explain_stream
+
+
+@app.route("/api/explain/<module>", methods=["POST"])
+def api_explain(module):
+    """
+    Stream a Claude-generated explanation of the computation.
+    The frontend receives server-sent text chunks and renders them progressively.
+    All prompt construction is in ai_explainer.py (Python).
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    def generate():
+        try:
+            for chunk in explain_stream(module, data):
+                # SSE format so the browser EventSource can consume it
+                yield f"data: {json.dumps(chunk)}\n\n"
+        except ValueError as e:
+            yield f"data: {json.dumps('[Error] ' + str(e))}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps('[Error] AI explainer failed: ' + str(e))}\n\n"
+        yield "data: [DONE]\n\n"
+
+    import json as _json
+
+    json = _json  # already imported above, just making sure alias is clear
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+if __name__ == "__main__":
     app.run(debug=True, port=5000)
