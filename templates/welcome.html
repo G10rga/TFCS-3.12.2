@@ -1,532 +1,875 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TFCS Platform — Welcome</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="static/css/welcome.css">
-</head>
-<body>
-
-<!-- ── NAV ──────────────────────────────────────────────── -->
-<nav class="nav" id="mainNav">
-  <a href="/welcome" class="nav-logo">
-    <div class="nav-logo-mark">
-      <svg viewBox="0 0 32 32" fill="none">
-        <path d="M4 16L16 4L28 16L16 28Z" stroke="currentColor" stroke-width="2"/>
-        <circle cx="16" cy="16" r="4" fill="currentColor"/>
-        <path d="M16 4V8M16 24V28M4 16H8M24 16H28" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <span class="nav-logo-name">Project By G1orga</span>
-  </a>
-  <div class="nav-links">
-    <a href="#modules"  class="nav-link">Modules</a>
-    <a href="#features" class="nav-link">Features</a>
-    <a href="#stack"    class="nav-link">Tech Stack</a>
-    <a href="#roadmap"  class="nav-link">Roadmap</a>
-    <a href="/about"    class="nav-link">Docs</a>
-    <a href="/index"         class="nav-cta">Open Platform →</a>
-  </div>
-</nav>
-
-<!-- ── HERO ─────────────────────────────────────────────── -->
-<section class="hero">
-  <video class="hero-video" autoplay muted loop playsinline
-         src="https://cdn.coverr.co/videos/coverr-abstract-digital-particles-1580/1080p.mp4">
-  </video>
-  <canvas id="hero-canvas"></canvas>
-  <div class="hero-gradient"></div>
-
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      TFCS Platform
-    </div>
-    <h1 class="hero-title">
-      <span class="line-1">TFCS Logic,</span>
-      <span class="line-2">Beautifully Solved.</span>
-    </h1>
-    <p class="hero-sub">
-      A complete toolkit for automata simulation, logic resolution,
-      and formula transformation — all powered by a Python backend.
-    </p>
-    <div class="hero-actions">
-      <a href="/index" class="btn-hero-primary">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-          <polygon points="6,4 16,10 6,16" fill="currentColor"/>
-        </svg>
-        Launch Platform
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TFCS Platform — Welcome</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="static/css/welcome.css" />
+  </head>
+  <body>
+    <!-- NAV  -->
+    <nav class="nav" id="mainNav">
+      <a href="/welcome" class="nav-logo">
+        <div class="nav-logo-mark">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path
+              d="M4 16L16 4L28 16L16 28Z"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <circle cx="16" cy="16" r="4" fill="currentColor" />
+            <path
+              d="M16 4V8M16 24V28M4 16H8M24 16H28"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+          </svg>
+        </div>
+        <span class="nav-logo-name">Project By G1orga</span>
       </a>
-      <a href="#modules" class="btn-hero-secondary">
-        Explore Modules ↓
-      </a>
-    </div>
-  </div>
+      <div class="nav-links">
+        <a href="#modules" class="nav-link">Modules</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#stack" class="nav-link">Tech Stack</a>
+        <a href="#roadmap" class="nav-link">Roadmap</a>
+        <a href="/about" class="nav-link">Docs</a>
+        <a href="/index" class="nav-cta">Open Platform →</a>
+      </div>
+    </nav>
 
-  <div class="hero-scroll">
-    <div class="hero-scroll-line"></div>
-    scroll
-  </div>
-</section>
+    <!-- HERO -->
+    <section class="hero">
+      <video
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        src="static/img/background1.mp4"
+      ></video>
+      <canvas id="hero-canvas"></canvas>
+      <div class="hero-gradient"></div>
 
-<!-- ── STATS BAR ─────────────────────────────────────────── -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat-item reveal d1">
-      <div class="stat-num" data-count="3">0</div>
-      <div class="stat-label">Live Modules</div>
-    </div>
-    <div class="stat-item reveal d2">
-      <div class="stat-num" data-count="5">0</div>
-      <div class="stat-label">In Roadmap</div>
-    </div>
-    <div class="stat-item reveal d3">
-      <div class="stat-num" data-suffix="%">100%</div>
-      <div class="stat-label">Python Backend</div>
-    </div>
-    <div class="stat-item reveal d4">
-      <div class="stat-num" data-suffix="ms">&lt;50ms</div>
-      <div class="stat-label">Avg Response</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── MODULES GRID ──────────────────────────────────────── -->
-<section class="section" id="modules">
-  <div class="section-tag">Modules</div>
-  <h2 class="section-title reveal">Three tools.<br>Live now.</h2>
-  <p class="section-sub reveal d2">Every module runs its algorithms entirely on the Python backend — the frontend only renders results. Five more modules are in the pipeline.</p>
-
-  <div class="modules-grid">
-
-    <a href="/automata" class="module-card wide reveal d1"
-       style="--card-color:var(--accent);--card-bg:rgba(245,166,35,0.08);--card-border:rgba(245,166,35,0.2);--card-glow:rgba(245,166,35,0.08)">
-      <div class="module-arrow">↗</div>
-      <div class="module-card-inner">
-        <div class="module-num">Module 01</div>
-        <div class="module-icon-wrap">⊙</div>
-        <div class="module-name">Automata Simulator</div>
-        <div class="module-desc">Simulate DFA, NFA, and Pushdown Automata with step-by-step configuration tracing. Visualise state diagrams with Cytoscape.js — transitions, ε-closures, stack contents all rendered live.</div>
-        <div class="module-tags">
-          <span class="module-tag">DFA</span>
-          <span class="module-tag">NFA</span>
-          <span class="module-tag">PDA</span>
-          <span class="module-tag">ε-closure</span>
-          <span class="module-tag">Graph Viz</span>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          TFCS Platform
+        </div>
+        <h1 class="hero-title">
+          <span class="line-1">TFCS Logic,</span>
+          <span class="line-2">Beautifully Solved.</span>
+        </h1>
+        <p class="hero-sub">
+          A complete toolkit for automata simulation, logic resolution, and
+          formula transformation — all powered by a Python backend.
+        </p>
+        <div class="hero-actions">
+          <a href="/index" class="btn-hero-primary">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <polygon points="6,4 16,10 6,16" fill="currentColor" />
+            </svg>
+            Launch Platform
+          </a>
+          <a href="#modules" class="btn-hero-secondary"> Explore Modules ↓ </a>
         </div>
       </div>
-    </a>
 
+      <div class="hero-scroll">
+        <div class="hero-scroll-line"></div>
+        scroll
+      </div>
+    </section>
 
-
-    <a href="/resolution" class="module-card reveal d3"
-       style="--card-color:var(--red);--card-bg:rgba(255,92,122,0.07);--card-border:rgba(255,92,122,0.18);--card-glow:rgba(255,92,122,0.06)">
-      <div class="module-arrow" style="color:var(--red)">↗</div>
-      <div class="module-card-inner">
-        <div class="module-num">Module 03</div>
-        <div class="module-icon-wrap" style="background:rgba(255,92,122,0.07);border-color:rgba(255,92,122,0.18)">⊢□</div>
-        <div class="module-name">Resolution Solver</div>
-        <div class="module-desc">Convert any propositional formula to CNF, extract clauses, and apply resolution until the empty clause or saturation.</div>
-        <div class="module-tags">
-          <span class="module-tag">CNF</span>
-          <span class="module-tag">Clauses</span>
-          <span class="module-tag">SAT/UNSAT</span>
+    <!-- STATS BAR  -->
+    <div class="stats-bar">
+      <div class="stats-inner">
+        <div class="stat-item reveal d1">
+          <div class="stat-num" data-count="3">0</div>
+          <div class="stat-label">Live Modules</div>
         </div>
-      </div>
-    </a>
-
-    <a href="/transformer" class="module-card reveal d4"
-       style="--card-color:var(--blue);--card-bg:rgba(91,159,255,0.07);--card-border:rgba(91,159,255,0.18);--card-glow:rgba(91,159,255,0.06)">
-      <div class="module-arrow" style="color:var(--blue)">↗</div>
-      <div class="module-card-inner">
-        <div class="module-num">Module 04</div>
-        <div class="module-icon-wrap" style="background:rgba(91,159,255,0.07);border-color:rgba(91,159,255,0.18)">⟺</div>
-        <div class="module-name">Formula Transformer</div>
-        <div class="module-desc">Transform any propositional formula to NNF, CNF, DNF with step-by-step rules. Truth table generated automatically.</div>
-        <div class="module-tags">
-          <span class="module-tag">NNF</span>
-          <span class="module-tag">CNF</span>
-          <span class="module-tag">DNF</span>
-          <span class="module-tag">Truth Table</span>
+        <div class="stat-item reveal d2">
+          <div class="stat-num" data-count="5">0</div>
+          <div class="stat-label">In Roadmap</div>
         </div>
-      </div>
-    </a>
-
-
-
-  </div>
-</section>
-
-<!-- ── VIDEO BREAK ───────────────────────────────────────── -->
-<div class="video-section">
-  <video class="video-bg" autoplay muted loop playsinline
-         src="https://cdn.coverr.co/videos/coverr-abstract-dark-motion-5064/1080p.mp4">
-  </video>
-  <div class="video-overlay"></div>
-  <div class="video-content reveal">
-    <div class="video-quote">
-      Algorithms that <em>explain themselves</em> — not just compute answers.
-    </div>
-    <div class="video-sub">Every module shows its work: full derivation steps, proof traces, substitution maps, and state-by-state execution paths.</div>
-  </div>
-</div>
-
-<!-- ── FEATURE SHOWCASE ──────────────────────────────────── -->
-<div class="showcase" id="features">
-  <div class="showcase-inner">
-
-    <!-- Feature 1: Automata -->
-    <div class="feature-row">
-      <div class="reveal-left">
-        <div class="feature-label">Automata Simulator</div>
-        <h3 class="feature-title">Three machine types. One interface.</h3>
-        <p class="feature-body">Switch between DFA, NFA, and PDA with a single click. The Python backend handles all transition logic — ε-closures, stack operations, configuration BFS — and returns the full execution trace.</p>
-        <ul class="feature-points">
-          <li>DFA deterministic step-by-step δ function tracing</li>
-          <li>NFA ε-closure via BFS over state sets</li>
-          <li>PDA configuration tracing with live stack display</li>
-          <li>Cytoscape.js graph auto-layout with state highlighting</li>
-        </ul>
-      </div>
-      <div class="reveal-right">
-        <div class="feature-visual" style="--vis-grad:radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.14), transparent)">
-          <div class="vis-states">
-            <div class="vis-state start">q₀<span class="vis-label">a</span></div>
-            <div class="vis-arrow">──▶</div>
-            <div class="vis-state">q₁<span class="vis-label">b</span></div>
-            <div class="vis-arrow">──▶</div>
-            <div class="vis-state accept">q₂</div>
-          </div>
-          <div class="vis-code">
-            <span class="dim">step 0 │</span> <span class="acc">q₀</span> input: <span class="kw">"aab"</span><br>
-            <span class="dim">step 1 │</span> δ(q₀, <span class="acc">'a'</span>) = <span class="grn">q₁</span><br>
-            <span class="dim">step 2 │</span> δ(q₁, <span class="acc">'a'</span>) = <span class="grn">q₁</span><br>
-            <span class="dim">step 3 │</span> δ(q₁, <span class="acc">'b'</span>) = <span class="grn">q₂</span><br>
-            <span class="dim">done  │</span> <span class="grn">ACCEPT ✓</span> — q₂ ∈ F
-          </div>
+        <div class="stat-item reveal d3">
+          <div class="stat-num" data-suffix="%">100%</div>
+          <div class="stat-label">Python Backend</div>
+        </div>
+        <div class="stat-item reveal d4">
+          <div class="stat-num" data-suffix="ms">&lt;50ms</div>
+          <div class="stat-label">Avg Response</div>
         </div>
       </div>
     </div>
 
-    <!-- Feature 2: Resolution -->
-    <div class="feature-row reverse">
-      <div class="reveal-right">
-        <div class="feature-label">Resolution Solver</div>
-        <h3 class="feature-title">Full proof in seconds.</h3>
-        <p class="feature-body">Enter any propositional formula. The solver automatically converts it to CNF, extracts the clause set, and applies resolution until it derives the empty clause (UNSAT) or saturates (SAT).</p>
-        <ul class="feature-points">
-          <li>Complete tokenizer and recursive-descent parser</li>
-          <li>NNF → CNF via De Morgan + distribution laws</li>
-          <li>Step-by-step clause resolution with labels</li>
-          <li>Satisfiability conclusion with proof annotation</li>
-        </ul>
-      </div>
-      <div class="reveal-left">
-        <div class="feature-visual" style="--vis-grad:radial-gradient(ellipse at 50% 0%, rgba(255,92,122,0.12), transparent)">
-          <div class="vis-code">
-            <span class="dim">formula  │</span> <span class="kw">(p → q) ∧ ¬q ∧ p</span><br>
-            <span class="dim">CNF      │</span> <span class="acc">(¬p ∨ q) ∧ ¬q ∧ p</span><br>
-            <br>
-            <span class="dim">C1       │</span> {<span class="pur">¬p</span>, <span class="grn">q</span>}  <span class="dim">given</span><br>
-            <span class="dim">C2       │</span> {<span class="red">¬q</span>}      <span class="dim">given</span><br>
-            <span class="dim">C3       │</span> {<span class="acc">p</span>}       <span class="dim">given</span><br>
-            <span class="dim">C4       │</span> {<span class="pur">¬p</span>}      <span class="dim">C1, C2</span><br>
-            <span class="dim">C5       │</span> <span class="red">□</span>         <span class="dim">C3, C4 → UNSAT</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- ── MODULES GRID ──────────────────────────────────────── -->
+    <section class="section" id="modules">
+      <div class="section-tag">Modules</div>
+      <h2 class="section-title reveal">Three tools.<br />Live now.</h2>
+      <p class="section-sub reveal d2">
+        Every module runs its algorithms entirely on the Python backend — the
+        frontend only renders results. Five more modules are in the pipeline.
+      </p>
 
-    <!-- Feature 3: Transformer -->
-    <div class="feature-row">
-      <div class="reveal-left">
-        <div class="feature-label">Formula Transformer</div>
-        <h3 class="feature-title">NNF. CNF. DNF.<br>All at once.</h3>
-        <p class="feature-body">Three normal forms computed simultaneously from a single formula input, each with annotated transformation steps and the applicable equivalence law shown at every stage.</p>
-        <ul class="feature-points">
-          <li>Eliminate ↔ then → before pushing negations inward</li>
-          <li>CNF: distribute ∨ over ∧ recursively</li>
-          <li>DNF: distribute ∧ over ∨ recursively</li>
-          <li>Truth table with tautology / contradiction classification</li>
-        </ul>
-      </div>
-      <div class="reveal-right">
-        <div class="feature-visual" style="--vis-grad:radial-gradient(ellipse at 50% 0%, rgba(91,159,255,0.12), transparent)">
-          <div class="vis-code">
-            <span class="dim">original │</span> <span class="kw">p → q</span><br>
-            <br>
-            <span class="dim">step 1   │</span> elim →<br>
-            <span class="dim">         │</span> <span class="acc">¬p ∨ q</span><br>
-            <br>
-            <span class="dim">NNF      │</span> <span class="grn">¬p ∨ q</span><br>
-            <span class="dim">CNF      │</span> <span class="blue">(¬p ∨ q)</span>  <span class="dim">1 clause</span><br>
-            <span class="dim">DNF      │</span> <span class="pur">¬p ∨ q</span>    <span class="dim">2 terms</span><br>
-            <br>
-            <span class="dim">classify │</span> <span class="acc">SATISFIABLE</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── TECH STACK ─────────────────────────────────────────── -->
-<div class="tech-section" id="stack">
-  <div class="section-tag">Technology</div>
-  <h2 class="section-title reveal">Built on solid foundations.</h2>
-  <p class="section-sub reveal d2" style="margin-bottom:40px">Pure Python for every algorithm. JavaScript only for rendering.</p>
-
-  <div class="tech-grid">
-    <div class="tech-card reveal d1">
-      <div class="tech-icon">🐍</div>
-      <div class="tech-name">Python 3.13+</div>
-      <div class="tech-role">All algorithms and computation</div>
-    </div>
-    <div class="tech-card reveal d2">
-      <div class="tech-icon">⚗️</div>
-      <div class="tech-name">Flask 3.1.3</div>
-      <div class="tech-role">REST API and routing</div>
-    </div>
-    <div class="tech-card reveal d3">
-      <div class="tech-icon">🕸️</div>
-      <div class="tech-name">Cytoscape.js</div>
-      <div class="tech-role">Automata graph visualization</div>
-    </div>
-    <div class="tech-card reveal d4">
-      <div class="tech-icon">🎨</div>
-      <div class="tech-name">CSS Variables</div>
-      <div class="tech-role">Full design system & theming</div>
-    </div>
-    <div class="tech-card reveal d1">
-      <div class="tech-icon">⚡</div>
-      <div class="tech-name">Vanilla JS</div>
-      <div class="tech-role">fetch API, DOM rendering</div>
-    </div>
-    <div class="tech-card reveal d2">
-      <div class="tech-icon">📐</div>
-      <div class="tech-name">Jinja2</div>
-      <div class="tech-role">Template inheritance</div>
-    </div>
-    <div class="tech-card reveal d3">
-      <div class="tech-icon">🔣</div>
-      <div class="tech-name">Syne + JetBrains Mono</div>
-      <div class="tech-role">Display + monospace fonts</div>
-    </div>
-    <div class="tech-card reveal d4">
-      <div class="tech-icon">🔐</div>
-      <div class="tech-name">Robinson's Algorithm</div>
-      <div class="tech-role">First-order unification (1965)</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── ROADMAP ────────────────────────────────────────────── -->
-<section class="roadmap-section" id="roadmap">
-  <div class="section-tag">Roadmap</div>
-  <h2 class="section-title reveal">What's coming next.</h2>
-  <p class="section-sub reveal d2">The platform is actively growing. These modules are designed, scoped, and queued for development — each extending the formal-methods toolkit further.</p>
-
-  <div class="roadmap-grid">
-
-    <!-- Unification Solver — NEXT -->
-    <div class="roadmap-card reveal d1"
-         style="--rc-accent:rgba(245,166,35,0.35);--rc-bg:rgba(245,166,35,0.08);--rc-border:rgba(245,166,35,0.2);--rc-glow:radial-gradient(circle at 0% 0%, rgba(245,166,35,0.08), transparent 60%)">
-      <div class="roadmap-card-inner">
-        <div class="rc-header">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="rc-icon-wrap">∿</div>
-            <div>
-              <div class="rc-module-num">Module 05</div>
-              <div class="rc-title">Unification Solver</div>
+      <div class="modules-grid">
+        <a
+          href="/automata"
+          class="module-card wide reveal d1"
+          style="
+            --card-color: var(--accent);
+            --card-bg: rgba(245, 166, 35, 0.08);
+            --card-border: rgba(245, 166, 35, 0.2);
+            --card-glow: rgba(245, 166, 35, 0.08);
+          "
+        >
+          <div class="module-arrow">↗</div>
+          <div class="module-card-inner">
+            <div class="module-num">Module 01</div>
+            <div class="module-icon-wrap">⊙</div>
+            <div class="module-name">Automata Simulator</div>
+            <div class="module-desc">
+              Simulate DFA, NFA, and Pushdown Automata with step-by-step
+              configuration tracing. Visualise state diagrams with Cytoscape.js
+              — transitions, ε-closures, stack contents all rendered live.
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">DFA</span>
+              <span class="module-tag">NFA</span>
+              <span class="module-tag">PDA</span>
+              <span class="module-tag">ε-closure</span>
+              <span class="module-tag">Graph Viz</span>
             </div>
           </div>
-          <span class="rc-badge next">Up Next</span>
-        </div>
-        <p class="rc-desc">First-order unification via Robinson's Algorithm — already referenced in the tech stack. Input two terms; the solver computes the most general unifier (MGU) step-by-step, showing each substitution applied and the resulting unified term.</p>
-        <div class="rc-features">
-          <span class="rc-feature">Robinson's Alg.</span>
-          <span class="rc-feature">MGU Derivation</span>
-          <span class="rc-feature">Substitution Maps</span>
-          <span class="rc-feature">Occur Check</span>
-          <span class="rc-feature">Unification Failure</span>
-        </div>
-        <div class="rc-progress">
-          <div class="rc-progress-bar"><div class="rc-progress-fill" style="--fill:35%;background:var(--accent)"></div></div>
-          <span class="rc-progress-label">In progress — 35%</span>
-        </div>
-      </div>
-    </div>
+        </a>
 
-    <!-- CFG Generator — NEXT -->
-    <div class="roadmap-card reveal d2"
-         style="--rc-accent:rgba(61,230,138,0.35);--rc-bg:rgba(61,230,138,0.07);--rc-border:rgba(61,230,138,0.18);--rc-glow:radial-gradient(circle at 100% 0%, rgba(61,230,138,0.07), transparent 60%)">
-      <div class="roadmap-card-inner">
-        <div class="rc-header">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="rc-icon-wrap" style="background:rgba(61,230,138,0.07);border-color:rgba(61,230,138,0.18);color:var(--green)">⟨G⟩</div>
-            <div>
-              <div class="rc-module-num">Module 06</div>
-              <div class="rc-title">CFG Generator</div>
+        <a
+          href="/resolution"
+          class="module-card reveal d3"
+          style="
+            --card-color: var(--red);
+            --card-bg: rgba(255, 92, 122, 0.07);
+            --card-border: rgba(255, 92, 122, 0.18);
+            --card-glow: rgba(255, 92, 122, 0.06);
+          "
+        >
+          <div class="module-arrow" style="color: var(--red)">↗</div>
+          <div class="module-card-inner">
+            <div class="module-num">Module 03</div>
+            <div
+              class="module-icon-wrap"
+              style="
+                background: rgba(255, 92, 122, 0.07);
+                border-color: rgba(255, 92, 122, 0.18);
+              "
+            >
+              ⊢□
+            </div>
+            <div class="module-name">Resolution Solver</div>
+            <div class="module-desc">
+              Convert any propositional formula to CNF, extract clauses, and
+              apply resolution until the empty clause or saturation.
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">CNF</span>
+              <span class="module-tag">Clauses</span>
+              <span class="module-tag">SAT/UNSAT</span>
             </div>
           </div>
-          <span class="rc-badge next">Up Next</span>
-        </div>
-        <p class="rc-desc">Context-Free Grammar designer and analyzer. Define productions in BNF notation, then derive strings step-by-step — both leftmost and rightmost. Detects ambiguity, computes FIRST/FOLLOW sets, and optionally converts to Chomsky Normal Form.</p>
-        <div class="rc-features">
-          <span class="rc-feature">BNF Input</span>
-          <span class="rc-feature">Derivation Steps</span>
-          <span class="rc-feature">FIRST / FOLLOW</span>
-          <span class="rc-feature">CNF Conversion</span>
-          <span class="rc-feature">Ambiguity Check</span>
-          <span class="rc-feature">Parse Tree Viz</span>
-        </div>
-        <div class="rc-progress">
-          <div class="rc-progress-bar"><div class="rc-progress-fill" style="--fill:10%;background:var(--green)"></div></div>
-          <span class="rc-progress-label">Design phase — 10%</span>
-        </div>
-      </div>
-    </div>
+        </a>
 
-    <!-- Tableau Prover — SOON -->
-    <div class="roadmap-card reveal d3"
-         style="--rc-accent:rgba(91,159,255,0.35);--rc-bg:rgba(91,159,255,0.07);--rc-border:rgba(91,159,255,0.18);--rc-glow:radial-gradient(circle at 0% 100%, rgba(91,159,255,0.06), transparent 60%)">
-      <div class="roadmap-card-inner">
-        <div class="rc-header">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="rc-icon-wrap" style="background:rgba(91,159,255,0.07);border-color:rgba(91,159,255,0.18);color:var(--blue)">⊥</div>
-            <div>
-              <div class="rc-module-num">Module 07</div>
-              <div class="rc-title">Semantic Tableaux</div>
+        <a
+          href="/transformer"
+          class="module-card reveal d4"
+          style="
+            --card-color: var(--blue);
+            --card-bg: rgba(91, 159, 255, 0.07);
+            --card-border: rgba(91, 159, 255, 0.18);
+            --card-glow: rgba(91, 159, 255, 0.06);
+          "
+        >
+          <div class="module-arrow" style="color: var(--blue)">↗</div>
+          <div class="module-card-inner">
+            <div class="module-num">Module 04</div>
+            <div
+              class="module-icon-wrap"
+              style="
+                background: rgba(91, 159, 255, 0.07);
+                border-color: rgba(91, 159, 255, 0.18);
+              "
+            >
+              ⟺
+            </div>
+            <div class="module-name">Formula Transformer</div>
+            <div class="module-desc">
+              Transform any propositional formula to NNF, CNF, DNF with
+              step-by-step rules. Truth table generated automatically.
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">NNF</span>
+              <span class="module-tag">CNF</span>
+              <span class="module-tag">DNF</span>
+              <span class="module-tag">Truth Table</span>
             </div>
           </div>
-          <span class="rc-badge soon">Planned</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── VIDEO BREAK ───────────────────────────────────────── -->
+    <div class="video-section">
+      <video
+        class="video-bg"
+        autoplay
+        muted
+        loop
+        playsinline
+        src="static/img/background.mp4"
+      ></video>
+      <div class="video-overlay"></div>
+      <div class="video-content reveal">
+        <div class="video-quote">
+          Algorithms that <em>explain themselves</em> — not just compute
+          answers.
         </div>
-        <p class="rc-desc">Analytic tableau method for propositional and first-order logic. Constructs the branching proof tree automatically, closes branches on contradictions, and classifies formulas as tautology, satisfiable, or unsatisfiable.</p>
-        <div class="rc-features">
-          <span class="rc-feature">Branch Trees</span>
-          <span class="rc-feature">α / β Rules</span>
-          <span class="rc-feature">FOL Extension</span>
-          <span class="rc-feature">Tree Viz</span>
-        </div>
-        <div class="rc-progress">
-          <div class="rc-progress-bar"><div class="rc-progress-fill" style="--fill:0%;background:var(--blue)"></div></div>
-          <span class="rc-progress-label">Queued</span>
+        <div class="video-sub">
+          Every module shows its work: full derivation steps, proof traces,
+          substitution maps, and state-by-state execution paths.
         </div>
       </div>
     </div>
 
-    <!-- Turing Machine — SOON -->
-    <div class="roadmap-card reveal d4"
-         style="--rc-accent:rgba(255,92,122,0.35);--rc-bg:rgba(255,92,122,0.06);--rc-border:rgba(255,92,122,0.18);--rc-glow:radial-gradient(circle at 100% 100%, rgba(255,92,122,0.06), transparent 60%)">
-      <div class="roadmap-card-inner">
-        <div class="rc-header">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="rc-icon-wrap" style="background:rgba(255,92,122,0.06);border-color:rgba(255,92,122,0.18);color:var(--red)">⊤</div>
-            <div>
-              <div class="rc-module-num">Module 08</div>
-              <div class="rc-title">Turing Machine Sim</div>
+    <!-- ── FEATURE SHOWCASE ──────────────────────────────────── -->
+    <div class="showcase" id="features">
+      <div class="showcase-inner">
+        <!-- Feature 1: Automata -->
+        <div class="feature-row">
+          <div class="reveal-left">
+            <div class="feature-label">Automata Simulator</div>
+            <h3 class="feature-title">Three machine types. One interface.</h3>
+            <p class="feature-body">
+              Switch between DFA, NFA, and PDA with a single click. The Python
+              backend handles all transition logic — ε-closures, stack
+              operations, configuration BFS — and returns the full execution
+              trace.
+            </p>
+            <ul class="feature-points">
+              <li>DFA deterministic step-by-step δ function tracing</li>
+              <li>NFA ε-closure via BFS over state sets</li>
+              <li>PDA configuration tracing with live stack display</li>
+              <li>Cytoscape.js graph auto-layout with state highlighting</li>
+            </ul>
+          </div>
+          <div class="reveal-right">
+            <div
+              class="feature-visual"
+              style="
+                --vis-grad: radial-gradient(
+                  ellipse at 50% 0%,
+                  rgba(245, 166, 35, 0.14),
+                  transparent
+                );
+              "
+            >
+              <div class="vis-states">
+                <div class="vis-state start">
+                  q₀<span class="vis-label">a</span>
+                </div>
+                <div class="vis-arrow">──▶</div>
+                <div class="vis-state">q₁<span class="vis-label">b</span></div>
+                <div class="vis-arrow">──▶</div>
+                <div class="vis-state accept">q₂</div>
+              </div>
+              <div class="vis-code">
+                <span class="dim">step 0 │</span>
+                <span class="acc">q₀</span> input: <span class="kw">"aab"</span
+                ><br />
+                <span class="dim">step 1 │</span> δ(q₀,
+                <span class="acc">'a'</span>) = <span class="grn">q₁</span
+                ><br />
+                <span class="dim">step 2 │</span> δ(q₁,
+                <span class="acc">'a'</span>) = <span class="grn">q₁</span
+                ><br />
+                <span class="dim">step 3 │</span> δ(q₁,
+                <span class="acc">'b'</span>) = <span class="grn">q₂</span
+                ><br />
+                <span class="dim">done │</span>
+                <span class="grn">ACCEPT ✓</span> — q₂ ∈ F
+              </div>
             </div>
           </div>
-          <span class="rc-badge soon">Planned</span>
         </div>
-        <p class="rc-desc">Visual Turing Machine simulator with tape rendering. Define states, alphabet, and transition function; watch the read/write head move step-by-step across the tape. Supports multi-step execution and halting detection.</p>
-        <div class="rc-features">
-          <span class="rc-feature">Tape Visualization</span>
-          <span class="rc-feature">Step Execution</span>
-          <span class="rc-feature">Halting Detection</span>
-          <span class="rc-feature">δ Table Editor</span>
-        </div>
-        <div class="rc-progress">
-          <div class="rc-progress-bar"><div class="rc-progress-fill" style="--fill:0%;background:var(--red)"></div></div>
-          <span class="rc-progress-label">Queued</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Platform Expansions — featured -->
-    <div class="roadmap-card featured reveal d2">
-      <div class="roadmap-card-inner">
-        <div class="rc-header">
-          <div style="display:flex;align-items:center;gap:14px">
-            <div class="rc-icon-wrap" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:var(--purple);font-size:16px">⬡</div>
-            <div>
-              <div class="rc-module-num">Platform Layer</div>
-              <div class="rc-title">Platform Expansions</div>
+        <!-- Feature 2: Resolution -->
+        <div class="feature-row reverse">
+          <div class="reveal-right">
+            <div class="feature-label">Resolution Solver</div>
+            <h3 class="feature-title">Full proof in seconds.</h3>
+            <p class="feature-body">
+              Enter any propositional formula. The solver automatically converts
+              it to CNF, extracts the clause set, and applies resolution until
+              it derives the empty clause (UNSAT) or saturates (SAT).
+            </p>
+            <ul class="feature-points">
+              <li>Complete tokenizer and recursive-descent parser</li>
+              <li>NNF → CNF via De Morgan + distribution laws</li>
+              <li>Step-by-step clause resolution with labels</li>
+              <li>Satisfiability conclusion with proof annotation</li>
+            </ul>
+          </div>
+          <div class="reveal-left">
+            <div
+              class="feature-visual"
+              style="
+                --vis-grad: radial-gradient(
+                  ellipse at 50% 0%,
+                  rgba(255, 92, 122, 0.12),
+                  transparent
+                );
+              "
+            >
+              <div class="vis-code">
+                <span class="dim">formula │</span>
+                <span class="kw">(p → q) ∧ ¬q ∧ p</span><br />
+                <span class="dim">CNF │</span>
+                <span class="acc">(¬p ∨ q) ∧ ¬q ∧ p</span><br />
+                <br />
+                <span class="dim">C1 │</span> {<span class="pur">¬p</span>,
+                <span class="grn">q</span>} <span class="dim">given</span><br />
+                <span class="dim">C2 │</span> {<span class="red">¬q</span>}
+                <span class="dim">given</span><br />
+                <span class="dim">C3 │</span> {<span class="acc">p</span>}
+                <span class="dim">given</span><br />
+                <span class="dim">C4 │</span> {<span class="pur">¬p</span>}
+                <span class="dim">C1, C2</span><br />
+                <span class="dim">C5 │</span> <span class="red">□</span>
+                <span class="dim">C3, C4 → UNSAT</span>
+              </div>
             </div>
           </div>
-          <span class="rc-badge later">Future</span>
         </div>
-        <p class="rc-desc">Beyond new modules, these cross-cutting improvements will enhance the platform experience across every tool.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px">
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-            <div style="font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Export Engine</div>
-            <div style="font-size:12px;color:var(--sub);line-height:1.6">Download proofs, derivations, and automata diagrams as PDF or LaTeX — ready for homework submission.</div>
+
+        <!-- Feature 3: Transformer -->
+        <div class="feature-row">
+          <div class="reveal-left">
+            <div class="feature-label">Formula Transformer</div>
+            <h3 class="feature-title">NNF. CNF. DNF.<br />All at once.</h3>
+            <p class="feature-body">
+              Three normal forms computed simultaneously from a single formula
+              input, each with annotated transformation steps and the applicable
+              equivalence law shown at every stage.
+            </p>
+            <ul class="feature-points">
+              <li>Eliminate ↔ then → before pushing negations inward</li>
+              <li>CNF: distribute ∨ over ∧ recursively</li>
+              <li>DNF: distribute ∧ over ∨ recursively</li>
+              <li>Truth table with tautology / contradiction classification</li>
+            </ul>
           </div>
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-            <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">History Log</div>
-            <div style="font-size:12px;color:var(--sub);line-height:1.6">Persistent session history per module so you can revisit and compare earlier computations.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-            <div style="font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Step Mode</div>
-            <div style="font-size:12px;color:var(--sub);line-height:1.6">Unified step-through control across all modules — pause, rewind, and replay any algorithm at your own pace.</div>
+          <div class="reveal-right">
+            <div
+              class="feature-visual"
+              style="
+                --vis-grad: radial-gradient(
+                  ellipse at 50% 0%,
+                  rgba(91, 159, 255, 0.12),
+                  transparent
+                );
+              "
+            >
+              <div class="vis-code">
+                <span class="dim">original │</span> <span class="kw">p → q</span
+                ><br />
+                <br />
+                <span class="dim">step 1 │</span> elim →<br />
+                <span class="dim"> │</span> <span class="acc">¬p ∨ q</span
+                ><br />
+                <br />
+                <span class="dim">NNF │</span> <span class="grn">¬p ∨ q</span
+                ><br />
+                <span class="dim">CNF │</span>
+                <span class="blue">(¬p ∨ q)</span>
+                <span class="dim">1 clause</span><br />
+                <span class="dim">DNF │</span> <span class="pur">¬p ∨ q</span>
+                <span class="dim">2 terms</span><br />
+                <br />
+                <span class="dim">classify │</span>
+                <span class="acc">SATISFIABLE</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div>
-</section>
+    <!-- ── TECH STACK ─────────────────────────────────────────── -->
+    <div class="tech-section" id="stack">
+      <div class="section-tag">Technology</div>
+      <h2 class="section-title reveal">Built on solid foundations.</h2>
+      <p class="section-sub reveal d2" style="margin-bottom: 40px">
+        Pure Python for every algorithm. JavaScript only for rendering.
+      </p>
 
-<!-- ── TERMINAL DEMO ──────────────────────────────────────── -->
-<div class="demo-section">
-  <div class="section-tag">Quick Start</div>
-  <h2 class="section-title reveal">Running in three commands.</h2>
-  <div style="height:40px"></div>
-  <div class="terminal reveal">
-    <div class="terminal-bar">
-      <div class="terminal-dot" style="background:#ff5f57"></div>
-      <div class="terminal-dot" style="background:#febc2e"></div>
-      <div class="terminal-dot" style="background:#28c840"></div>
-      <div class="terminal-title">bash — TFCS Platform</div>
+      <div class="tech-grid">
+        <div class="tech-card reveal d1">
+          <div class="tech-icon">🐍</div>
+          <div class="tech-name">Python 3.13+</div>
+          <div class="tech-role">All algorithms and computation</div>
+        </div>
+        <div class="tech-card reveal d2">
+          <div class="tech-icon">⚗️</div>
+          <div class="tech-name">Flask 3.1.3</div>
+          <div class="tech-role">REST API and routing</div>
+        </div>
+        <div class="tech-card reveal d3">
+          <div class="tech-icon">🕸️</div>
+          <div class="tech-name">Cytoscape.js</div>
+          <div class="tech-role">Automata graph visualization</div>
+        </div>
+        <div class="tech-card reveal d4">
+          <div class="tech-icon">🎨</div>
+          <div class="tech-name">CSS Variables</div>
+          <div class="tech-role">Full design system & theming</div>
+        </div>
+        <div class="tech-card reveal d1">
+          <div class="tech-icon">⚡</div>
+          <div class="tech-name">Vanilla JS</div>
+          <div class="tech-role">fetch API, DOM rendering</div>
+        </div>
+        <div class="tech-card reveal d2">
+          <div class="tech-icon">📐</div>
+          <div class="tech-name">Jinja2</div>
+          <div class="tech-role">Template inheritance</div>
+        </div>
+        <div class="tech-card reveal d3">
+          <div class="tech-icon">🔣</div>
+          <div class="tech-name">Syne + JetBrains Mono</div>
+          <div class="tech-role">Display + monospace fonts</div>
+        </div>
+        <div class="tech-card reveal d4">
+          <div class="tech-icon">🔐</div>
+          <div class="tech-name">Robinson's Algorithm</div>
+          <div class="tech-role">First-order unification (1965)</div>
+        </div>
+      </div>
     </div>
-    <div class="terminal-body" id="terminal-body">
+
+    <!-- ── ROADMAP ────────────────────────────────────────────── -->
+    <section class="roadmap-section" id="roadmap">
+      <div class="section-tag">Roadmap</div>
+      <h2 class="section-title reveal">What's coming next.</h2>
+      <p class="section-sub reveal d2">
+        The platform is actively growing. These modules are designed, scoped,
+        and queued for development — each extending the formal-methods toolkit
+        further.
+      </p>
+
+      <div class="roadmap-grid">
+        <!-- Unification Solver — NEXT -->
+        <div
+          class="roadmap-card reveal d1"
+          style="
+            --rc-accent: rgba(245, 166, 35, 0.35);
+            --rc-bg: rgba(245, 166, 35, 0.08);
+            --rc-border: rgba(245, 166, 35, 0.2);
+            --rc-glow: radial-gradient(
+              circle at 0% 0%,
+              rgba(245, 166, 35, 0.08),
+              transparent 60%
+            );
+          "
+        >
+          <div class="roadmap-card-inner">
+            <div class="rc-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div class="rc-icon-wrap">∿</div>
+                <div>
+                  <div class="rc-module-num">Module 05</div>
+                  <div class="rc-title">Unification Solver</div>
+                </div>
+              </div>
+              <span class="rc-badge next">Up Next</span>
+            </div>
+            <p class="rc-desc">
+              First-order unification via Robinson's Algorithm — already
+              referenced in the tech stack. Input two terms; the solver computes
+              the most general unifier (MGU) step-by-step, showing each
+              substitution applied and the resulting unified term.
+            </p>
+            <div class="rc-features">
+              <span class="rc-feature">Robinson's Alg.</span>
+              <span class="rc-feature">MGU Derivation</span>
+              <span class="rc-feature">Substitution Maps</span>
+              <span class="rc-feature">Occur Check</span>
+              <span class="rc-feature">Unification Failure</span>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar">
+                <div
+                  class="rc-progress-fill"
+                  style="--fill: 35%; background: var(--accent)"
+                ></div>
+              </div>
+              <span class="rc-progress-label">In progress — 35%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CFG Generator — NEXT -->
+        <div
+          class="roadmap-card reveal d2"
+          style="
+            --rc-accent: rgba(61, 230, 138, 0.35);
+            --rc-bg: rgba(61, 230, 138, 0.07);
+            --rc-border: rgba(61, 230, 138, 0.18);
+            --rc-glow: radial-gradient(
+              circle at 100% 0%,
+              rgba(61, 230, 138, 0.07),
+              transparent 60%
+            );
+          "
+        >
+          <div class="roadmap-card-inner">
+            <div class="rc-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  class="rc-icon-wrap"
+                  style="
+                    background: rgba(61, 230, 138, 0.07);
+                    border-color: rgba(61, 230, 138, 0.18);
+                    color: var(--green);
+                  "
+                >
+                  ⟨G⟩
+                </div>
+                <div>
+                  <div class="rc-module-num">Module 06</div>
+                  <div class="rc-title">CFG Generator</div>
+                </div>
+              </div>
+              <span class="rc-badge next">Up Next</span>
+            </div>
+            <p class="rc-desc">
+              Context-Free Grammar designer and analyzer. Define productions in
+              BNF notation, then derive strings step-by-step — both leftmost and
+              rightmost. Detects ambiguity, computes FIRST/FOLLOW sets, and
+              optionally converts to Chomsky Normal Form.
+            </p>
+            <div class="rc-features">
+              <span class="rc-feature">BNF Input</span>
+              <span class="rc-feature">Derivation Steps</span>
+              <span class="rc-feature">FIRST / FOLLOW</span>
+              <span class="rc-feature">CNF Conversion</span>
+              <span class="rc-feature">Ambiguity Check</span>
+              <span class="rc-feature">Parse Tree Viz</span>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar">
+                <div
+                  class="rc-progress-fill"
+                  style="--fill: 10%; background: var(--green)"
+                ></div>
+              </div>
+              <span class="rc-progress-label">Design phase — 10%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau Prover — SOON -->
+        <div
+          class="roadmap-card reveal d3"
+          style="
+            --rc-accent: rgba(91, 159, 255, 0.35);
+            --rc-bg: rgba(91, 159, 255, 0.07);
+            --rc-border: rgba(91, 159, 255, 0.18);
+            --rc-glow: radial-gradient(
+              circle at 0% 100%,
+              rgba(91, 159, 255, 0.06),
+              transparent 60%
+            );
+          "
+        >
+          <div class="roadmap-card-inner">
+            <div class="rc-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  class="rc-icon-wrap"
+                  style="
+                    background: rgba(91, 159, 255, 0.07);
+                    border-color: rgba(91, 159, 255, 0.18);
+                    color: var(--blue);
+                  "
+                >
+                  ⊥
+                </div>
+                <div>
+                  <div class="rc-module-num">Module 07</div>
+                  <div class="rc-title">Semantic Tableaux</div>
+                </div>
+              </div>
+              <span class="rc-badge soon">Planned</span>
+            </div>
+            <p class="rc-desc">
+              Analytic tableau method for propositional and first-order logic.
+              Constructs the branching proof tree automatically, closes branches
+              on contradictions, and classifies formulas as tautology,
+              satisfiable, or unsatisfiable.
+            </p>
+            <div class="rc-features">
+              <span class="rc-feature">Branch Trees</span>
+              <span class="rc-feature">α / β Rules</span>
+              <span class="rc-feature">FOL Extension</span>
+              <span class="rc-feature">Tree Viz</span>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar">
+                <div
+                  class="rc-progress-fill"
+                  style="--fill: 0%; background: var(--blue)"
+                ></div>
+              </div>
+              <span class="rc-progress-label">Queued</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Turing Machine — SOON -->
+        <div
+          class="roadmap-card reveal d4"
+          style="
+            --rc-accent: rgba(255, 92, 122, 0.35);
+            --rc-bg: rgba(255, 92, 122, 0.06);
+            --rc-border: rgba(255, 92, 122, 0.18);
+            --rc-glow: radial-gradient(
+              circle at 100% 100%,
+              rgba(255, 92, 122, 0.06),
+              transparent 60%
+            );
+          "
+        >
+          <div class="roadmap-card-inner">
+            <div class="rc-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  class="rc-icon-wrap"
+                  style="
+                    background: rgba(255, 92, 122, 0.06);
+                    border-color: rgba(255, 92, 122, 0.18);
+                    color: var(--red);
+                  "
+                >
+                  ⊤
+                </div>
+                <div>
+                  <div class="rc-module-num">Module 08</div>
+                  <div class="rc-title">Turing Machine Sim</div>
+                </div>
+              </div>
+              <span class="rc-badge soon">Planned</span>
+            </div>
+            <p class="rc-desc">
+              Visual Turing Machine simulator with tape rendering. Define
+              states, alphabet, and transition function; watch the read/write
+              head move step-by-step across the tape. Supports multi-step
+              execution and halting detection.
+            </p>
+            <div class="rc-features">
+              <span class="rc-feature">Tape Visualization</span>
+              <span class="rc-feature">Step Execution</span>
+              <span class="rc-feature">Halting Detection</span>
+              <span class="rc-feature">δ Table Editor</span>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar">
+                <div
+                  class="rc-progress-fill"
+                  style="--fill: 0%; background: var(--red)"
+                ></div>
+              </div>
+              <span class="rc-progress-label">Queued</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Platform Expansions — featured -->
+        <div class="roadmap-card featured reveal d2">
+          <div class="roadmap-card-inner">
+            <div class="rc-header">
+              <div style="display: flex; align-items: center; gap: 14px">
+                <div
+                  class="rc-icon-wrap"
+                  style="
+                    background: rgba(167, 139, 250, 0.1);
+                    border-color: rgba(167, 139, 250, 0.25);
+                    color: var(--purple);
+                    font-size: 16px;
+                  "
+                >
+                  ⬡
+                </div>
+                <div>
+                  <div class="rc-module-num">Platform Layer</div>
+                  <div class="rc-title">Platform Expansions</div>
+                </div>
+              </div>
+              <span class="rc-badge later">Future</span>
+            </div>
+            <p class="rc-desc">
+              Beyond new modules, these cross-cutting improvements will enhance
+              the platform experience across every tool.
+            </p>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 10px;
+                margin-top: 4px;
+              "
+            >
+              <div
+                style="
+                  background: rgba(255, 255, 255, 0.03);
+                  border: 1px solid var(--border);
+                  border-radius: 10px;
+                  padding: 14px 16px;
+                "
+              >
+                <div
+                  style="
+                    font-family: var(--mono);
+                    font-size: 10px;
+                    color: var(--purple);
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    margin-bottom: 6px;
+                  "
+                >
+                  Export Engine
+                </div>
+                <div
+                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
+                >
+                  Download proofs, derivations, and automata diagrams as PDF or
+                  LaTeX — ready for homework submission.
+                </div>
+              </div>
+              <div
+                style="
+                  background: rgba(255, 255, 255, 0.03);
+                  border: 1px solid var(--border);
+                  border-radius: 10px;
+                  padding: 14px 16px;
+                "
+              >
+                <div
+                  style="
+                    font-family: var(--mono);
+                    font-size: 10px;
+                    color: var(--blue);
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    margin-bottom: 6px;
+                  "
+                >
+                  History Log
+                </div>
+                <div
+                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
+                >
+                  Persistent session history per module so you can revisit and
+                  compare earlier computations.
+                </div>
+              </div>
+              <div
+                style="
+                  background: rgba(255, 255, 255, 0.03);
+                  border: 1px solid var(--border);
+                  border-radius: 10px;
+                  padding: 14px 16px;
+                "
+              >
+                <div
+                  style="
+                    font-family: var(--mono);
+                    font-size: 10px;
+                    color: var(--green);
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    margin-bottom: 6px;
+                  "
+                >
+                  Step Mode
+                </div>
+                <div
+                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
+                >
+                  Unified step-through control across all modules — pause,
+                  rewind, and replay any algorithm at your own pace.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TERMINAL DEMO ──────────────────────────────────────── -->
+    <div class="demo-section">
+      <div class="section-tag">Quick Start</div>
+      <h2 class="section-title reveal">Running in three commands.</h2>
+      <div style="height: 40px"></div>
+      <div class="terminal reveal">
+        <div class="terminal-bar">
+          <div class="terminal-dot" style="background: #ff5f57"></div>
+          <div class="terminal-dot" style="background: #febc2e"></div>
+          <div class="terminal-dot" style="background: #28c840"></div>
+          <div class="terminal-title">bash — TFCS Platform</div>
+        </div>
+        <div class="terminal-body" id="terminal-body"></div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ── CTA ───────────────────────────────────────────────── -->
-<section class="cta-section">
-  <video class="cta-video" autoplay muted loop playsinline
-         src="https://cdn.coverr.co/videos/coverr-abstract-digital-particles-1580/1080p.mp4">
-  </video>
-  <div class="cta-overlay"></div>
-  <div class="cta-content reveal">
-    <h2 class="cta-title">Ready to explore formal methods?</h2>
-    <p class="cta-sub">Jump straight into the platform. No setup required — everything runs locally with a single command.</p>
-    <div class="cta-actions">
-      <a href="/index" class="btn-hero-primary">Open Platform →</a>
-      <a href="/about" class="btn-hero-secondary">Read the Docs</a>
-    </div>
-  </div>
-</section>
+    <!-- ── CTA ───────────────────────────────────────────────── -->
+    <section class="cta-section">
+      <video
+        class="cta-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        src="static/img/background.mp4"
+      ></video>
+      <div class="cta-overlay"></div>
+      <div class="cta-content reveal">
+        <h2 class="cta-title">Ready to explore formal methods?</h2>
+        <p class="cta-sub">
+          Jump straight into the platform. No setup required — everything runs
+          locally with a single command.
+        </p>
+        <div class="cta-actions">
+          <a href="/index" class="btn-hero-primary">Open Platform →</a>
+          <a href="/about" class="btn-hero-secondary">Read the Docs</a>
+        </div>
+      </div>
+    </section>
 
-<!-- ── FOOTER ────────────────────────────────────────────── -->
-<footer class="footer">
-  <div class="footer-left">TFCS Platform v3.13.0 — Project By G1orga</div>
-  <div class="footer-right">
-    <a href="/index"            class="footer-link">Dashboard</a>
-    <a href="/automata"    class="footer-link">Automata</a>
-    <a href="/resolution"  class="footer-link">Resolution</a>
-    <a href="/transformer" class="footer-link">Transformer</a>
-    <a href="#roadmap"     class="footer-link">Roadmap</a>
-    <a href="/about"       class="footer-link">Docs</a>
-  </div>
-</footer>
+    <!-- ── FOOTER ────────────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="footer-left">TFCS Platform v3.13.0 — Project By G1orga</div>
+      <div class="footer-right">
+        <a href="/index" class="footer-link">Dashboard</a>
+        <a href="/automata" class="footer-link">Automata</a>
+        <a href="/resolution" class="footer-link">Resolution</a>
+        <a href="/transformer" class="footer-link">Transformer</a>
+        <a href="#roadmap" class="footer-link">Roadmap</a>
+        <a href="/about" class="footer-link">Docs</a>
+      </div>
+    </footer>
 
-<script src="static/js/welcome.js"></script>
-</body>
+    <script src="static/js/welcome.js"></script>
+  </body>
 </html>
