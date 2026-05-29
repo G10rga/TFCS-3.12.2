@@ -189,3 +189,4 @@ def validate_automaton(data: Dict) -> List[str]:
         if a and a not in states:
             errors.append(f"Accept state '{a}' is not in the states list")
     return errors
+
