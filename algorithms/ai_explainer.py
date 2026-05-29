@@ -1,13 +1,3 @@
-"""
-ai_explainer.py — Builds detailed prompts from resolution/transformer/automata
-results and streams the explanation back to the caller.
-
-Backend: Groq (free tier) — https://console.groq.com
-Model:   llama-3.3-70b-versatile  (free, fast, high quality)
-
-Drop-in replacement for the Anthropic version.
-Only change: `pip install groq`  and set GROQ_API_KEY in your environment.
-"""
 
 import os
 from groq import Groq
