@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Automata Simulator — FormalCS{% endblock %}
+{% block title %}Automata Simulator — ProofLab{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -275,6 +275,7 @@
                 </select>
             </div>
 
+
             <!-- Step pip strip -->
             <div class="step-strip" id="stepStrip"></div>
 
@@ -287,6 +288,18 @@
             <!-- Final verdict -->
             <div id="finalVerdict"></div>
         </div>
+        <button class="btn" id="btn-explain"
+                    style="width:100%;margin-top:8px;
+                       background:rgba(167,139,250,0.08);
+                       border:1px solid rgba(167,139,250,0.25);
+                       color:rgba(167,139,250,0.9);
+                       font-family:var(--font-display);font-size:13px;font-weight:600;
+                       padding:12px;border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s;"
+                    onmouseover="this.style.background='rgba(167,139,250,0.14)'"
+                    onmouseout="this.style.background='rgba(167,139,250,0.08)'"
+                    onclick="triggerExplainer()">
+                ✦ Explain with AI
+            </button>
 
         <!-- Idle state when no simulation yet -->
         <div id="result-idle">
@@ -303,6 +316,7 @@
 
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<script src="{{ url_for('static', filename='js/ai-explain.js') }}"></script>
 <script>
 let cy = null;
 let currentType = 'DFA';
