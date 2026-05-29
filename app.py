@@ -5,45 +5,40 @@ from algorithms.automata import parse_automaton, validate_automaton
 from algorithms.pda import parse_pda
 from algorithms.resolution import solve_resolution
 from algorithms.transformer import get_all_transforms
+from flask import Response, stream_with_context
+from algorithms.ai_explainer import explain_stream
+
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 
-
-# Page Routes
+#  ─────────────────────────────────────────────────────────Page Routes ─────────────────────────────────────────────────────────
 @app.route("/index")
 def welcome():
     return render_template("index.html")
-
 
 @app.route("/")
 def index():
     return render_template("welcome.html")
 
-
 @app.route("/automata")
 def automata():
     return render_template("automata.html")
-
 
 @app.route("/resolution")
 def resolution():
     return render_template("resolution.html")
 
-
 @app.route("/transformer")
 def transformer():
     return render_template("transformer.html")
-
 
 @app.route("/about")
 def about():
     return render_template("about.html")
 
-
-# API Routes
-
+#  ─────────────────────────────────────────────────────────API Routes ─────────────────────────────────────────────────────────
 
 @app.route("/api/automata/simulate", methods=["POST"])
 def api_automata_simulate():
@@ -166,16 +161,14 @@ def api_transformer_transform():
     return jsonify(result)
 
 
-# ─── AI Explainer Route ────────────────────────────────────────────────────
+#  ───────────────────────────────────────────────────────── AI Explainer Route ────────────────────────────────────────────────────
 
-from flask import Response, stream_with_context
-from algorithms.ai_explainer import explain_stream
 
 
 @app.route("/api/explain/<module>", methods=["POST"])
 def api_explain(module):
     """
-    Stream a Claude-generated explanation of the computation.
+    Stream a AI generated explanation of the computation.
     The frontend receives server-sent text chunks and renders them progressively.
     All prompt construction is in ai_explainer.py (Python).
     """
