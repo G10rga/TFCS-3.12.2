@@ -1,5 +1,4 @@
-[README.md](https://github.com/user-attachments/files/28174373/README.md)
-# 🔷 ProofLab — TFCS Platform
+# 🔷 ProofLab — TFCS Platform `v3.13.0`
 ### *Theoretical Foundations of Computer Science · Platform by G1orga*
 
 > **A full-stack interactive formal methods toolkit** built with Python (Flask) backend and a modern dark-themed frontend. All computational logic runs server-side in Python; JavaScript handles only UI rendering and asynchronous requests.
@@ -18,6 +17,22 @@ ProofLab is a web application implementing formal computer science modules in on
 | 04 | **Formula Transformer** | NNF, CNF, DNF transformations with step annotations and truth table generation |
 
 Every module includes an **AI Explainer** — a streaming, markdown-rendered breakdown of the computation powered by Groq (LLaMA 3.3 70B).
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Welcome Page
+![Welcome Page](static/img/welcome.gif)
+
+### ⚙️ Automata Simulator — DFA / NFA
+![Automata Simulator](static/img/automata1.gif)
+
+### 🔁 Formula Transformer — NNF / CNF / DNF
+![Formula Transformer](static/img/transformation.gif)
+
+### 🧩 Resolution Solver
+![Resolution Solver](static/img/Resolution.gif)
 
 ---
 
@@ -67,7 +82,7 @@ prooflab/
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
-| Backend | Python 3.12.4 | All algorithms and computation |
+| Backend | Python 3.13+ | All algorithms and computation |
 | Framework | Flask 3.1.3 | HTTP server, routing, JSON API |
 | Templating | Jinja2 3.1.6 | HTML template inheritance |
 | AI | Groq · LLaMA 3.3 70B | Streaming educational explanations |
@@ -82,7 +97,7 @@ prooflab/
 
 ### Prerequisites
 
-- Python **3.12.4**
+- Python **3.13+**
 - A free [Groq API key](https://console.groq.com)
 
 ### Installation
@@ -260,5 +275,5 @@ This project is open for educational use. Feel free to fork and build on it.
 ---
 
 <div align="center">
-  <sub>Built by <strong>G1orga</strong> · ProofLab · Python 3.12.4</sub>
+  <sub>Built by <strong>G1orga</strong> · ProofLab v3.13.0</sub>
 </div>
