@@ -12,9 +12,8 @@ ProofLab is a web application implementing formal computer science modules in on
 | # | Module | Description |
 |---|--------|-------------|
 | 01 | **Automata Simulator** | DFA/NFA simulation with step-by-step trace and Cytoscape.js state diagram |
-| 02 | **Pushdown Automaton** | PDA simulation via BFS over configurations, acceptance by final state or empty stack |
-| 03 | **Resolution Solver** | Propositional resolution with CNF conversion and full proof visualisation |
-| 04 | **Formula Transformer** | NNF, CNF, DNF transformations with step annotations and truth table generation |
+| 02 | **Resolution Solver** | Propositional resolution with CNF conversion and full proof visualisation |
+| 03 | **Formula Transformer** | NNF, CNF, DNF transformations with step annotations and truth table generation |
 
 Every module includes an **AI Explainer** — a streaming, markdown-rendered breakdown of the computation powered by Groq (LLaMA 3.3 70B).
 
