@@ -13,7 +13,7 @@ def get_all_transforms(formula_str: str) -> Dict:
         ast = parse_formula(formula_str)
         original = ast_to_str(ast)
 
-        # ── NNF: show each sub-step separately ────────────────────────────
+        # NNF: show each sub-step separately
         after_iff = eliminate_iff(ast)
         after_imp = eliminate_imp(after_iff)
         after_neg = push_negation(after_imp)
@@ -32,7 +32,7 @@ def get_all_transforms(formula_str: str) -> Dict:
              "rule": "¬(P ∧ Q) ≡ ¬P ∨ ¬Q  |  ¬(P ∨ Q) ≡ ¬P ∧ ¬Q  |  ¬¬P ≡ P"},
         ]
 
-        # ── CNF: distribute ∨ over ∧ ──────────────────────────────────────
+        # CNF: distribute ∨ over ∧
         nnf_for_cnf = to_nnf(ast)
         cnf_result  = distribute_or(nnf_for_cnf)
 
@@ -48,7 +48,7 @@ def get_all_transforms(formula_str: str) -> Dict:
              "rule": "P ∨ (Q ∧ R)  ≡  (P ∨ Q) ∧ (P ∨ R)"},
         ]
 
-        # ── DNF: distribute ∧ over ∨ ──────────────────────────────────────
+        # DNF: distribute ∧ over ∨
         nnf_for_dnf = to_nnf(ast)
         dnf_result  = distribute_and(nnf_for_dnf)
         dnf_terms   = _collect_terms(dnf_result)
@@ -62,7 +62,7 @@ def get_all_transforms(formula_str: str) -> Dict:
              "rule": "P ∧ (Q ∨ R)  ≡  (P ∧ Q) ∨ (P ∧ R)"},
         ]
 
-        # ── Truth table ────────────────────────────────────────────────────
+        # Truth table
         variables = _get_vars(ast)
         tt = _truth_table(ast, variables)
 
@@ -79,10 +79,9 @@ def get_all_transforms(formula_str: str) -> Dict:
         return {"success": False, "error": str(exc)}
 
 
-# ── helpers ───────────────────────────────────────────────────────────────
+# helpers
 
 def _collect_terms(dnf) -> List[str]:
-    """Flatten a DNF AST into a list of conjunct strings."""
     terms = []
 
     def or_walk(node):
@@ -136,7 +135,6 @@ def _truth_table(ast, variables: List[str]) -> Dict:
     rows = []
 
     for mask in range(2 ** n):
-        # build assignment from bitmask (MSB = first variable)
         env = {v: bool((mask >> (n - j - 1)) & 1) for j, v in enumerate(variables)}
         val = _eval(ast, env)
         rows.append({"values": [env[v] for v in variables], "result": val})
