@@ -1,5 +1,5 @@
-from collections import defaultdict, deque
-from typing import Dict, List, Set, Optional, Tuple
+from collections import defaultdict
+from typing import Dict, List, Set
 
 
 class FiniteAutomaton:
@@ -11,7 +11,6 @@ class FiniteAutomaton:
         self.accept_states = set(accept_states)
         self.fa_type = fa_type.upper()
 
-    # only needed for NFA, but kept here to avoid code duplication
     def epsilon_closure(self, state_set: Set[str]) -> Set[str]:
         closure = set(state_set)
         stack = list(state_set)
@@ -127,7 +126,7 @@ class FiniteAutomaton:
                   "is_accept": st in self.accept_states}
                  for st in sorted(self.states)]
 
-        # group labels for edges that share the same (from, to) pair
+
         edge_map = defaultdict(list)
         for state, sym_map in self.transitions.items():
             for sym, targets in sym_map.items():
@@ -164,7 +163,7 @@ def parse_automaton(data: Dict) -> FiniteAutomaton:
             continue
         fr, sym, to = parts
         if fa_type == "DFA":
-            trans[fr][sym] = to          # DFA: single target
+            trans[fr][sym] = to
         else:
             if to not in trans[fr][sym]:
                 trans[fr][sym].append(to)
@@ -180,13 +179,13 @@ def validate_automaton(data: Dict) -> List[str]:
     accepts = [s.strip() for s in data.get("accept_states", "").split(",") if s.strip()]
 
     if not states:
-        errors.append("States list is empty")
+        errors.append("states list is empty")
     if not start:
-        errors.append("Start state is required")
+        errors.append("start state is required")
     elif start not in states:
-        errors.append(f"Start state '{start}' is not in the states list")
+        errors.append(f"start state '{start}' is not in the states list")
     for a in accepts:
         if a and a not in states:
-            errors.append(f"Accept state '{a}' is not in the states list")
+            errors.append(f"accept state '{a}' is not in the states list")
     return errors
 
