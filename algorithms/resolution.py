@@ -40,8 +40,7 @@ def tokenize(raw: str):
     yield 'EOF', ''
 
 
-# Parser (recursive descent)
-# precedence: IFF < IMP < OR < AND < NOT < atom
+# Parser
 
 class Parser:
     def __init__(self, raw):
@@ -99,7 +98,7 @@ class Parser:
 def parse_formula(s: str): return Parser(s).parse()
 
 
-# ── AST to string ─────────────────────────────────────────────────────────
+# AST to string
 
 def ast_to_str(n, p=0) -> str:
     prec = {'IFF': 1, 'IMP': 2, 'OR': 3, 'AND': 4, 'NOT': 5, 'VAR': 6}
@@ -114,9 +113,10 @@ def ast_to_str(n, p=0) -> str:
         return f"({s})" if p > prec['OR'] else s
     if k == 'IMP': return f"({ast_to_str(n[1])} → {ast_to_str(n[2])})"
     if k == 'IFF': return f"({ast_to_str(n[1])} ↔ {ast_to_str(n[2])})"
+    return None
 
 
-# ── Normal form transformations ───────────────────────────────────────────
+# Normal form transformations
 
 def eliminate_iff(n):
     k = n[0]
@@ -181,7 +181,7 @@ def to_cnf(n): return distribute_or(to_nnf(n))
 def to_dnf(n): return distribute_and(to_nnf(n))
 
 
-# ── Clause extraction ─────────────────────────────────────────────────────
+#clause extraction
 
 def extract_clauses(cnf) -> List[FrozenSet[str]]:
     clauses = []
@@ -203,7 +203,7 @@ def extract_clauses(cnf) -> List[FrozenSet[str]]:
     return clauses
 
 
-# ── Resolution ────────────────────────────────────────────────────────────
+#resolution
 
 def _neg(lit): return lit[1:] if lit.startswith('~') else '~' + lit
 
@@ -247,8 +247,7 @@ def resolution_solver(clauses) -> Dict:
             "conclusion": "SATISFIABLE — no empty clause derivable"}
 
 
-# ── Main entry ────────────────────────────────────────────────────────────
-
+#main
 def solve_resolution(formula_str: str) -> Dict:
     try:
         ast = parse_formula(formula_str)
