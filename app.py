@@ -42,7 +42,7 @@ def about():
 
 @app.route("/api/automata/simulate", methods=["POST"])
 def api_automata_simulate():
-    """Simulate finite automaton on input string."""
+    #Simulate finite automaton on input string
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -68,7 +68,6 @@ def api_automata_simulate():
 
 @app.route("/api/automata/graph", methods=["POST"])
 def api_automata_graph():
-    """Get graph data for automaton visualization only (no simulation)."""
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -87,7 +86,6 @@ def api_automata_graph():
 
 @app.route("/api/pda/simulate", methods=["POST"])
 def api_pda_simulate():
-    """Simulate pushdown automaton on input string."""
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -107,7 +105,6 @@ def api_pda_simulate():
 
 @app.route("/api/pda/graph", methods=["POST"])
 def api_pda_graph():
-    """Get PDA graph data only."""
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -125,7 +122,6 @@ def api_pda_graph():
 
 @app.route("/api/resolution/solve", methods=["POST"])
 def api_resolution_solve():
-    """Apply resolution method to formula."""
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -144,7 +140,6 @@ def api_resolution_solve():
 
 @app.route("/api/transformer/transform", methods=["POST"])
 def api_transformer_transform():
-    """Transform formula to NNF, CNF, DNF."""
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -161,17 +156,12 @@ def api_transformer_transform():
     return jsonify(result)
 
 
-#  ───────────────────────────────────────────────────────── AI Explainer Route ────────────────────────────────────────────────────
+#AI explainer route
 
 
 
 @app.route("/api/explain/<module>", methods=["POST"])
 def api_explain(module):
-    """
-    Stream a AI generated explanation of the computation.
-    The frontend receives server-sent text chunks and renders them progressively.
-    All prompt construction is in ai_explainer.py (Python).
-    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -179,7 +169,6 @@ def api_explain(module):
     def generate():
         try:
             for chunk in explain_stream(module, data):
-                # SSE format so the browser EventSource can consume it
                 yield f"data: {json.dumps(chunk)}\n\n"
         except ValueError as e:
             yield f"data: {json.dumps('[Error] ' + str(e))}\n\n"
@@ -189,7 +178,7 @@ def api_explain(module):
 
     import json as _json
 
-    json = _json  # already imported above, just making sure alias is clear
+    json = _json
 
     return Response(
         stream_with_context(generate()),
