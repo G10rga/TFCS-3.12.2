@@ -145,6 +145,70 @@
     background: rgba(10,10,15,0.8); padding: 4px 8px; border-radius: 6px;
     border: 1px solid var(--border); pointer-events: none;
 }
+
+/* AI Explain panel */
+.ai-explain-card {
+    margin-top: 24px;
+}
+.ai-explain-body {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    padding: 4px 0;
+    min-height: 60px;
+}
+.ai-explain-body h1,
+.ai-explain-body h2,
+.ai-explain-body h3 {
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    margin: 16px 0 6px;
+}
+.ai-explain-body strong { color: var(--text-primary); }
+.ai-explain-body code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--accent);
+}
+.ai-explain-body ul, .ai-explain-body ol {
+    padding-left: 20px;
+    margin: 6px 0;
+}
+.ai-explain-body li { margin: 3px 0; }
+.ai-explain-body p { margin: 6px 0; }
+
+.ai-explain-btn {
+    width: 100%;
+    margin-top: 8px;
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: rgba(167,139,250,0.9);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.ai-explain-btn:hover { background: rgba(167,139,250,0.14); }
+.ai-explain-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Streaming cursor blink */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.stream-cursor {
+    display: inline-block;
+    width: 2px; height: 13px;
+    background: rgba(167,139,250,0.8);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink 0.9s infinite;
+}
 </style>
 {% endblock %}
 
@@ -240,7 +304,6 @@
                 <button class="btn btn-ghost btn-sm" onclick="refreshGraph()">↺ Refresh</button>
             </div>
 
-            <!-- Graph container with overlay label -->
             <div id="fa-graph" class="cytoscape-container">
                 <div class="empty-state">
                     <div class="empty-icon">◈</div>
@@ -275,7 +338,6 @@
                 </select>
             </div>
 
-
             <!-- Step pip strip -->
             <div class="step-strip" id="stepStrip"></div>
 
@@ -288,18 +350,11 @@
             <!-- Final verdict -->
             <div id="finalVerdict"></div>
         </div>
-        <button class="btn" id="btn-explain"
-                    style="width:100%;margin-top:8px;
-                       background:rgba(167,139,250,0.08);
-                       border:1px solid rgba(167,139,250,0.25);
-                       color:rgba(167,139,250,0.9);
-                       font-family:var(--font-display);font-size:13px;font-weight:600;
-                       padding:12px;border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s;"
-                    onmouseover="this.style.background='rgba(167,139,250,0.14)'"
-                    onmouseout="this.style.background='rgba(167,139,250,0.08)'"
-                    onclick="triggerExplainer()">
-                ✦ Explain with AI
-            </button>
+
+        <!-- Explain with AI button -->
+        <button class="ai-explain-btn" id="btn-explain" onclick="triggerExplainer()">
+            ✦ Explain with AI
+        </button>
 
         <!-- Idle state when no simulation yet -->
         <div id="result-idle">
@@ -308,6 +363,22 @@
                 <div class="empty-title">Ready to simulate</div>
                 <div class="empty-sub">Configure machine and input string, then click Simulate</div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Explanation Panel — full width below the grid -->
+<div id="ai-explain-panel" style="display:none; margin-top:24px;">
+    <div class="card ai-explain-card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="card-title-icon">✦</div>
+                AI Explanation
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="closeExplainer()">✕ Close</button>
+        </div>
+        <div id="ai-explain-output" class="ai-explain-body">
+            <span style="color:var(--text-muted)">Generating explanation…</span>
         </div>
     </div>
 </div>
@@ -388,7 +459,10 @@ async function simulate() {
     simResult = result.result;
     simFaType = result.fa_type;
 
-    renderGraph(result.graph, null);  // draw clean graph first
+    // Hide any open explainer panel when re-simulating
+    document.getElementById('ai-explain-panel').style.display = 'none';
+
+    renderGraph(result.graph, null);
     initPlayback(result.result, data.input_string, result.fa_type);
 }
 
@@ -527,6 +601,115 @@ function renderGraph(graph, _unused) {
     });
 }
 
+// ─── AI Explainer ─────────────────────────────────────────
+function triggerExplainer() {
+    if (!simResult) {
+        showToast('Run a simulation first.', 'error', 2500);
+        return;
+    }
+
+    const data = getFormData();
+    const payload = {
+        fa_type:       simFaType,
+        states:        data.states,
+        alphabet:      data.alphabet,
+        start_state:   data.start_state,
+        accept_states: data.accept_states,
+        transitions:   data.transitions,
+        input_string:  data.input_string,
+        result:        simResult
+    };
+
+    const panel = document.getElementById('ai-explain-panel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Use ai-explain.js's runExplainer if available, otherwise fall back to
+    // a built-in streaming fetch so the button always works.
+    if (typeof runExplainer === 'function') {
+        runExplainer('automata', payload);
+    } else {
+        streamExplain('automata', payload);
+    }
+}
+
+function closeExplainer() {
+    document.getElementById('ai-explain-panel').style.display = 'none';
+}
+
+// ─── Built-in streaming fallback (used if ai-explain.js doesn't expose runExplainer) ───
+async function streamExplain(module, payload) {
+    const content = document.getElementById('ai-explain-content');
+    const btn = document.getElementById('btn-explain');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating…';
+    content.innerHTML = '<span class="stream-cursor"></span>';
+
+    let fullText = '';
+
+    try {
+        const resp = await fetch('/api/explain/stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ module, data: payload })
+        });
+
+        if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+
+        content.innerHTML = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+
+            // SSE lines: "data: <text>\n\n"
+            chunk.split('\n').forEach(line => {
+                if (line.startsWith('data: ')) {
+                    const text = line.slice(6);
+                    if (text === '[DONE]') return;
+                    fullText += text;
+                    // Render markdown-lite: bold, code
+                    content.innerHTML = renderMarkdownLite(fullText) + '<span class="stream-cursor"></span>';
+                }
+            });
+        }
+
+        // Final render without cursor
+        content.innerHTML = renderMarkdownLite(fullText);
+
+    } catch (err) {
+        content.innerHTML = `<span style="color:var(--red)">⚠ Failed to load explanation: ${err.message}</span>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '✦ Explain with AI';
+    }
+}
+
+// Very lightweight markdown renderer (bold, inline code, headings, bullets)
+function renderMarkdownLite(md) {
+    return md
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/^(?!<[hul])(.+)$/gm, (m) => m.trim() ? m : '')
+        .replace(/(<\/h[1-4]>|<\/ul>|<\/li>)/g, '$1')
+        .replace(/^([^<\n].+)$/gm, (m) => `<p>${m}</p>`)
+        .replace(/<p><\/p>/g, '');
+}
+
+// ─── Playback ─────────────────────────────────────────────
 function initPlayback(result, inputString, faType) {
     stopPlay();
 
@@ -538,7 +721,6 @@ function initPlayback(result, inputString, faType) {
     document.getElementById('result-idle').style.display = 'none';
 
     buildTape(inputString);
-
     buildPips(result);
 
     const scrubber = document.getElementById('stepScrubber');
@@ -604,7 +786,7 @@ function goToStep(idx) {
     const isLast = idx === totalSteps - 1;
 
     const visitedNodes = new Set();
-    const visitedEdgePairs = []; // [{from, to, symbol}]
+    const visitedEdgePairs = [];
 
     for (let i = 0; i < idx; i++) {
         const s = simulationSteps[i];
@@ -675,14 +857,13 @@ function goToStep(idx) {
         }
     });
 
-    const symbolIdx = idx - 1; // which character was just read
+    const symbolIdx = idx - 1;
     document.querySelectorAll('.tape-cell').forEach((cell, i) => {
         cell.classList.remove('current', 'read');
         if (i < symbolIdx) cell.classList.add('read');
         else if (i === symbolIdx) cell.classList.add('current');
     });
 
-    const symbol = step.symbol_read || (idx === 0 ? 'start' : '—');
     document.getElementById('stepSymbol').textContent = step.symbol_read || (idx === 0 ? '▶' : '—');
     document.getElementById('stepDescText').innerHTML = `<strong>${step.description}</strong><br>
         <span>Active states: {${(step.current_states || []).join(', ') || '∅'}}</span>
