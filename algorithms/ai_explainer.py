@@ -1,7 +1,7 @@
 from groq import Groq
 from typing import Generator
 
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 MODEL = "llama-3.3-70b-versatile"  # active Groq reasoning model with chain-of-thought; fallback: "llama-3.3-70b-versatile"
 
 SYSTEM = (
