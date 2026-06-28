@@ -1,159 +1,408 @@
-# 🔷 ProofLab — TFCS Platform `v3.13.0`
-### *Theoretical Foundations of Computer Science · Platform by G1orga*
+# ProofLab — Interactive TFCS Platform
 
-> **A full-stack interactive formal methods toolkit** built with Python (Flask) backend and a modern dark-themed frontend. All computational logic runs server-side in Python; JavaScript handles only UI rendering and asynchronous requests.
-
----
-
-## 📌 Project Overview
-
-ProofLab is a web application implementing formal computer science modules in one cohesive interface:
-
-| # | Module | Description |
-|---|--------|-------------|
-| 01 | **Automata Simulator** | DFA/NFA simulation with step-by-step trace and Cytoscape.js state diagram |
-| 02 | **Resolution Solver** | Propositional resolution with CNF conversion and full proof visualisation |
-| 03 | **Formula Transformer** | NNF, CNF, DNF transformations with step annotations and truth table generation |
-
-Every module includes an **AI Explainer** — a streaming, markdown-rendered breakdown of the computation powered by Groq (LLaMA 3.3 70B).
+**Course:** Theoretical Foundations of Computer Science (TFCS)  
+**Author:** Lasha Giorgadze (G1orga)  
+**Version:** 3.13.0  
+**Type:** Final course project — web application
 
 ---
 
-## 📸 Screenshots
+## Abstract
 
-### 🏠 Welcome Page
-![Welcome Page](static/img/welcome.gif)
+ProofLab is a full-stack web application that implements core topics from **Theoretical Foundations of Computer Science** in an interactive, educational form. The platform lets users define formal objects (automata, logical formulas), run algorithms on them, and inspect every intermediate step of the computation.
 
-### ⚙️ Automata Simulator — DFA / NFA
-![Automata Simulator](static/img/automata1.gif)
+All **algorithmic logic is implemented in Python** on the server. The browser is responsible only for presentation: forms, graphs, step-by-step traces, and optional AI-generated explanations. This separation keeps the implementation faithful to the course material while still providing a modern user interface.
 
-### 🔁 Formula Transformer — NNF / CNF / DNF
-![Formula Transformer](static/img/transformation.gif)
+The three main modules exposed in the UI are:
 
-### 🧩 Resolution Solver
-![Resolution Solver](static/img/Resolution.gif)
+1. **Automata Simulator** — DFA and NFA simulation with animated state diagrams  
+2. **Resolution Solver** — propositional resolution with CNF conversion and proof trace  
+3. **Formula Transformer** — NNF, CNF, DNF conversion plus truth table generation  
 
 ---
 
-## 🏗️ Architecture
+## Table of Contents
+
+1. [Project Motivation](#project-motivation)
+2. [Learning Objectives](#learning-objectives)
+3. [System Architecture](#system-architecture)
+4. [Project Structure](#project-structure)
+5. [How the Code Works — End-to-End Flow](#how-the-code-works--end-to-end-flow)
+6. [Backend: Flask Application](#backend-flask-application)
+7. [Algorithm Modules](#algorithm-modules)
+   - [Automata (`algorithms/automata.py`)](#1-automata-simulator-algorithmsautomatapy)
+   - [Resolution (`algorithms/resolution.py`)](#2-resolution-solver-algorithmsresolutionpy)
+   - [Transformer (`algorithms/transformer.py`)](#3-formula-transformer-algorithmstransformerpy)
+   - [AI Explainer (`algorithms/ai_explainer.py`)](#4-ai-explainer-algorithmsai_explainerpy)
+8. [Frontend Architecture](#frontend-architecture)
+9. [Input Syntax](#input-syntax)
+10. [Installation and Running](#installation-and-running)
+11. [Demo Guide for Evaluation](#demo-guide-for-evaluation)
+12. [Screenshots](#screenshots)
+13. [Dependencies](#dependencies)
+14. [Future Work](#future-work)
+15. [Conclusion](#conclusion)
+
+---
+
+## Project Motivation
+
+Formal methods courses cover abstract concepts — automata, normal forms, resolution proofs — that are difficult to understand from notation alone. Textbook examples show final results but rarely let students **experiment** with their own machines and formulas.
+
+ProofLab addresses this by:
+
+- Letting the user **define** a problem (automaton configuration, logical formula)
+- Running the **exact algorithm** taught in the course
+- Showing a **complete trace** of every step (states visited, clauses derived, rewrite rules applied)
+- Visualising results (state diagrams via Cytoscape.js, clause lists, truth tables)
+
+The project demonstrates that course algorithms can be implemented cleanly in Python and exposed through a REST API without sacrificing correctness or pedagogical clarity.
+
+---
+
+## Learning Objectives
+
+This project demonstrates understanding of:
+
+| Topic | Implementation |
+|-------|----------------|
+| Deterministic and non-deterministic finite automata | `FiniteAutomaton` class with DFA and NFA simulation |
+| ε-closure and set-based NFA transitions | BFS over epsilon transitions in `epsilon_closure()` |
+| Propositional logic syntax | Recursive-descent parser producing an AST |
+| Normal forms (NNF, CNF, DNF) | Structural AST rewrites with distributivity |
+| Resolution refutation | Clause extraction + pairwise resolution until empty clause or saturation |
+| Truth tables and formula classification | Exhaustive evaluation over \(2^n\) assignments |
+| Web architecture | Flask routes, JSON API, separation of logic and presentation |
+
+---
+
+## System Architecture
+
+The application follows a classic **three-layer architecture**:
 
 ```
-prooflab/
-├── app.py                    # Flask application + all REST API routes
-├── requirements.txt          # Python dependencies
-├── .env                      # Environment variables (not committed)
+┌─────────────────────────────────────────────────────────────┐
+│  PRESENTATION LAYER (Browser)                               │
+│  templates/*.html  +  static/css  +  static/js              │
+│  — forms, sidebar, graphs, step lists, toasts               │
+└──────────────────────────┬──────────────────────────────────┘
+                           │  HTTP (JSON POST / SSE)
+┌──────────────────────────▼──────────────────────────────────┐
+│  APPLICATION LAYER (Flask — app.py)                         │
+│  — page routes (render HTML)                                │
+│  — API routes (validate input, call algorithms, return JSON)│
+└──────────────────────────┬──────────────────────────────────┘
+                           │  Python function calls
+┌──────────────────────────▼──────────────────────────────────┐
+│  ALGORITHM LAYER (algorithms/*.py)                          │
+│  — pure Python, no Flask dependency                         │
+│  — automata, resolution, transformer, ai_explainer          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Request lifecycle (example: automata simulation)
+
+```
+User clicks "Simulate"
+       │
+       ▼
+automata.html  —  JavaScript collects form fields
+       │
+       ▼
+POST /api/automata/simulate  { states, alphabet, transitions, input_string, fa_type }
+       │
+       ▼
+app.py  —  validate_automaton()  →  parse_automaton()  →  fa.simulate()
+       │
+       ▼
+JSON response  { result: { steps, accepted }, graph: { nodes, edges } }
+       │
+       ▼
+JavaScript  —  renders Cytoscape graph + playback controls + step trace
+```
+
+The same pattern applies to resolution and transformation: **the frontend never implements the algorithm**; it only sends input and renders the structured JSON response.
+
+---
+
+## Project Structure
+
+```
+ProofLab-TFCS-Platform-v3.13.0/
+├── app.py                      # Flask server: page routes + REST API
+├── requirements.txt            # Python dependencies
+├── .env                        # GROQ_API_KEY (not committed; see Installation)
+├── .gitignore
 ├── README.md
 │
-├── algorithms/               # Pure Python computation — no Flask dependency
-│   ├── automata.py           # DFA/NFA: transitions, ε-closure, acceptance
-│   ├── pda.py                # PDA: BFS simulation, stack management
-│   ├── resolution.py         # Parser, AST transforms, clause resolution
-│   ├── transformer.py        # NNF/CNF/DNF transforms, truth table
-│   └── ai_explainer.py       # Groq streaming prompt builder
+├── algorithms/                 # Core computation (framework-independent)
+│   ├── automata.py             # DFA/NFA: parse, simulate, graph export
+│   ├── pda.py                  # PDA simulation (backend; API ready)
+│   ├── resolution.py           # Parser, AST, CNF, resolution prover
+│   ├── transformer.py          # NNF/CNF/DNF + truth table
+│   └── ai_explainer.py         # Groq LLM streaming explanations
 │
-├── templates/                # Jinja2 HTML (all extend base.html)
-│   ├── base.html             # Sidebar nav, toast system, shared layout
-│   ├── welcome.html          # Landing / presentation page
-│   ├── index.html            # Platform dashboard
-│   ├── automata.html         # DFA/NFA/PDA simulator page
-│   ├── resolution.html       # Resolution solver page
-│   ├── transformer.html      # Formula transformer page
-│   └── about.html            # Documentation & API reference
+├── templates/                    # Jinja2 HTML templates
+│   ├── base.html               # Shared layout: sidebar, mobile nav, toasts
+│   ├── welcome.html            # Landing / project presentation page
+│   ├── index.html              # Platform dashboard
+│   ├── automata.html           # Automata simulator UI
+│   ├── resolution.html         # Resolution solver UI
+│   ├── transformer.html        # Formula transformer UI
+│   └── about.html              # In-app documentation
 │
 └── static/
     ├── css/
-    │   ├── main.css          # Full design system (CSS variables, components)
-    │   └── welcome.css       # Landing page styles
+    │   ├── main.css            # Design system + responsive layout
+    │   └── welcome.css         # Landing page styles
     └── js/
-        ├── main.js           # Sidebar, toasts, API calls, tabs, graph rendering
-        ├── welcome.js        # Landing page animations
-        └── ai-explain.js     # SSE streaming handler
+        ├── main.js             # Sidebar, API helper, toasts, UI utilities
+        ├── welcome.js          # Landing page animations + mobile nav
+        └── ai-explain.js       # Server-Sent Events streaming handler
 ```
 
-**Backend → Frontend flow:**
-1. User fills form → JS collects data → `fetch()` POST to Flask endpoint
-2. Flask calls Python algorithm module → returns JSON
-3. JS renders result HTML inline (steps, formulas, graphs, proof trees)
+**Design principle:** `algorithms/` contains no Flask imports. This makes each module testable in isolation and mirrors how algorithms are presented in the course — as self-contained procedures independent of any UI.
 
 ---
 
-## ⚙️ Technologies
+## How the Code Works — End-to-End Flow
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| Backend | Python 3.13+ | All algorithms and computation |
-| Framework | Flask 3.1.3 | HTTP server, routing, JSON API |
-| Templating | Jinja2 3.1.6 | HTML template inheritance |
-| AI | Groq · LLaMA 3.3 70B | Streaming educational explanations |
-| Graph Viz | Cytoscape.js 3.28 | Automata state diagrams |
-| Frontend | Vanilla JS | fetch API, DOM rendering, UI |
-| Styling | CSS Custom Properties | Full design system, responsive |
-| Fonts | Syne + JetBrains Mono | Display + monospace typography |
+### 1. Page routes (HTML)
 
----
+`app.py` maps URLs to Jinja2 templates:
 
-## 🚀 Getting Started
+| URL | Template | Purpose |
+|-----|----------|---------|
+| `/` | `welcome.html` | Project presentation and module overview |
+| `/index` | `index.html` | Dashboard with links to all modules |
+| `/automata` | `automata.html` | Automata simulator |
+| `/resolution` | `resolution.html` | Resolution solver |
+| `/transformer` | `transformer.html` | Formula transformer |
+| `/about` | `about.html` | Documentation |
 
-### Prerequisites
+All module pages **extend** `base.html`, which provides the sidebar navigation, mobile menu, toast notifications, and shared CSS/JS.
 
-- Python **3.13+**
-- A free [Groq API key](https://console.groq.com)
+### 2. API routes (JSON computation)
 
-### Installation
+| Method | Endpoint | Python entry point |
+|--------|----------|-------------------|
+| `POST` | `/api/automata/simulate` | `parse_automaton()` → `simulate()` |
+| `POST` | `/api/automata/graph` | `parse_automaton()` → `get_graph_data()` |
+| `POST` | `/api/resolution/solve` | `solve_resolution()` |
+| `POST` | `/api/transformer/transform` | `get_all_transforms()` |
+| `POST` | `/api/explain/<module>` | `explain_stream()` (SSE) |
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/prooflab.git
-cd prooflab
+Each API handler follows the same pattern:
 
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate        # Linux / macOS
-venv\Scripts\activate           # Windows
+1. Parse JSON body from the request
+2. Validate input (return `400` with error message if invalid)
+3. Call the algorithm module
+4. Return JSON (or SSE stream for AI explanations)
 
-# 3. Install dependencies
-pip install -r requirements.txt
-```
+### 3. Shared frontend utilities (`static/js/main.js`)
 
-### Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-> ⚠️ Never commit your `.env` file. Make sure it is listed in `.gitignore`.
-
-### Run
-
-```bash
-python app.py
-```
-
-Open **http://localhost:5000** in your browser.
+| Function | Role |
+|----------|------|
+| `apiCall(endpoint, data, btn)` | POST JSON, show loading state on button, handle errors |
+| `showToast(message, type)` | User feedback for success/error |
+| `highlightFormula(formula)` | Colour-code logical symbols in rendered output |
+| Sidebar toggle | Responsive navigation on mobile/tablet |
 
 ---
 
-## 🔌 API Reference
+## Backend: Flask Application
 
-All computation is handled server-side. The frontend communicates via these JSON endpoints:
+`app.py` is the single entry point. Key configuration:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/automata/simulate` | Simulate a DFA or NFA on an input string |
-| `POST` | `/api/automata/graph` | Get graph node/edge data for Cytoscape.js |
-| `POST` | `/api/pda/simulate` | Simulate a PDA on an input string (BFS) |
-| `POST` | `/api/pda/graph` | Get PDA graph data |
-| `POST` | `/api/resolution/solve` | Apply the resolution method to a formula |
-| `POST` | `/api/transformer/transform` | Transform a formula to NNF, CNF, and DNF |
-| `POST` | `/api/explain/<module>` | Stream an AI explanation (Server-Sent Events) |
+```python
+app = Flask(__name__)
+app.config["JSON_AS_ASCII"] = False   # preserve ¬, ∧, ∨ in JSON responses
+```
+
+**Why Flask?** It is lightweight, maps naturally to a course project scope, and supports both server-rendered pages (Jinja2) and JSON APIs without a heavy framework. All TFCS logic stays in `algorithms/`, keeping `app.py` thin — it only routes requests and serialises results.
 
 ---
 
-## 🧮 Input Syntax
+## Algorithm Modules
 
-### Propositional Logic
+### 1. Automata Simulator (`algorithms/automata.py`)
+
+#### Theory
+
+A **finite automaton** is a tuple \(M = (Q, \Sigma, \delta, q_0, F)\):
+
+- \(Q\) — finite set of states  
+- \(\Sigma\) — input alphabet  
+- \(\delta\) — transition function (DFA: one state; NFA: set of states)  
+- \(q_0\) — start state  
+- \(F\) — accept states  
+
+A string is **accepted** if, after reading all symbols, the machine is in an accept state (DFA) or the active state set intersects \(F\) (NFA).
+
+#### Code structure
+
+| Component | Description |
+|-----------|-------------|
+| `FiniteAutomaton` | Data class holding states, alphabet, transitions, start, accepts |
+| `epsilon_closure(state_set)` | BFS over ε-transitions; used by NFA before/after each symbol |
+| `_run_dfa(input)` | Single current state; rejects on missing transition |
+| `_run_nfa(input)` | Maintains a **set** of active states; applies ε-closure after each symbol |
+| `simulate(input)` | Dispatches to DFA or NFA based on `fa_type` |
+| `get_graph_data()` | Exports nodes/edges for Cytoscape.js rendering |
+| `parse_automaton(data)` | Parses comma-separated form input into a `FiniteAutomaton` |
+| `validate_automaton(data)` | Checks start/accept states belong to \(Q\) |
+
+#### DFA simulation (simplified)
+
+```python
+cur = start_state
+for sym in input_string:
+    nxt = transitions[cur].get(sym)
+    if nxt is None:
+        return rejected
+    cur = nxt
+return cur in accept_states
+```
+
+Each transition appends a **trace step** with: current state, symbol read, remaining input, and a human-readable description (e.g. `δ(q0, 'a') = q1`).
+
+#### NFA simulation
+
+After each symbol, the algorithm:
+
+1. Collects all targets reachable from every state in the current set  
+2. Applies ε-closure to the result  
+3. Accepts if `current_states ∩ accept_states ≠ ∅`
+
+#### Frontend integration
+
+`automata.html` sends the machine configuration to `/api/automata/simulate`, then:
+
+- Builds a **Cytoscape.js** graph from `graph.nodes` and `graph.edges`
+- Runs a **step-by-step playback** (scrubber, play/pause) over `result.steps`
+- Highlights active/visited nodes and edges during animation
+
+---
+
+### 2. Resolution Solver (`algorithms/resolution.py`)
+
+#### Theory
+
+The **resolution method** is a refutation procedure for propositional logic:
+
+1. Convert formula to **CNF** (conjunctive normal form)  
+2. Extract a **clause set** (each conjunct is a disjunction of literals)  
+3. Repeatedly resolve pairs of clauses containing complementary literals \(L\) and \(\neg L\)  
+4. If the **empty clause** \(\square\) is derived → **UNSATISFIABLE**  
+5. If no new clauses can be added → **SATISFIABLE** (saturation)
+
+#### Code structure
+
+| Component | Description |
+|-----------|-------------|
+| `tokenize(raw)` | Lexer: splits input into tokens (`VAR`, `NOT`, `AND`, `OR`, `IMP`, `IFF`, …) |
+| `Parser` | Recursive-descent parser; builds AST with operator precedence |
+| `eliminate_iff`, `eliminate_imp` | Remove ↔ and → using equivalences |
+| `push_negation` | De Morgan's laws + double negation → **NNF** |
+| `distribute_or` | \(P \lor (Q \land R) \equiv (P \lor Q) \land (P \lor R)\) → **CNF** |
+| `extract_clauses(cnf)` | Walk CNF AST; each top-level ∧ becomes one clause |
+| `_resolve(c1, c2)` | If \(L \in c_1\) and \(\neg L \in c_2\), return \((c_1 \setminus \{L\}) \cup (c_2 \setminus \{\neg L\})\) |
+| `resolution_solver(clauses)` | Fixpoint loop over all clause pairs; records every step |
+| `solve_resolution(formula_str)` | Orchestrates parse → NNF → CNF → clauses → resolution |
+
+#### AST representation
+
+Formulas are stored as nested tuples, e.g.:
+
+```python
+('AND', ('OR', ('VAR', 'p'), ('NOT', ('VAR', 'q'))), ('VAR', 'r'))
+#  represents  (p ∨ ¬q) ∧ r
+```
+
+This tree structure makes structural rewrites (NNF, distribution) straightforward recursive functions.
+
+#### Resolution loop
+
+```python
+while changed:
+    for c1, c2 in combinations(working, 2):
+        res = resolve(c1, c2)
+        if res is new:
+            add res to working set
+            record step with parent clause labels
+            if res is empty: return UNSATISFIABLE
+return SATISFIABLE
+```
+
+The frontend displays each clause with a label (`C1`, `C2`, …) and shows which parent clauses produced each resolvent.
+
+---
+
+### 3. Formula Transformer (`algorithms/transformer.py`)
+
+#### Theory
+
+| Normal form | Property | Construction |
+|-------------|----------|--------------|
+| **NNF** | Negations only on atoms | Eliminate →, ↔; push ¬ inward |
+| **CNF** | Conjunction of disjunctions | NNF + distribute ∨ over ∧ |
+| **DNF** | Disjunction of conjunctions | NNF + distribute ∧ over ∨ |
+
+The module reuses the parser and AST transforms from `resolution.py` via imports.
+
+#### Code structure
+
+| Function | Output |
+|----------|--------|
+| `get_all_transforms(formula_str)` | Main entry: returns NNF, CNF, DNF, and truth table |
+| NNF steps | Four annotated steps: original → remove ↔ → remove → → push negations |
+| CNF steps | NNF → distribute ∨ over ∧ → clause list |
+| DNF steps | NNF → distribute ∧ over ∨ → minterm list |
+| `_truth_table(ast, variables)` | Evaluates formula for all \(2^n\) assignments |
+| Classification | `is_tautology`, `is_contradiction`, `is_satisfiable` |
+
+#### Truth table generation
+
+For \(n\) variables, the code iterates `mask` from `0` to `2^n - 1`, maps each bit to True/False, and evaluates the AST with `_eval()`. This provides independent verification of the formula's semantic properties alongside the syntactic normal forms.
+
+---
+
+### 4. AI Explainer (`algorithms/ai_explainer.py`)
+
+Optional educational feature: after a computation, the user can request a **natural-language explanation** streamed from Groq (LLaMA 3.3 70B).
+
+**How it works:**
+
+1. Frontend POSTs computation results to `/api/explain/<module>`  
+2. `explain_stream(module, data)` selects a prompt builder (`automata`, `resolution`, `transformer`)  
+3. The prompt includes **only the actual steps from the computation** — the model is instructed not to invent steps  
+4. Response is streamed via **Server-Sent Events (SSE)** and rendered as markdown in the UI  
+
+This layer does not affect correctness of the algorithms; it is a tutoring aid built on top of the structured JSON output.
+
+> **Note:** Requires a `GROQ_API_KEY` environment variable. See [Installation](#installation-and-running).
+
+---
+
+## Frontend Architecture
+
+| File | Responsibility |
+|------|----------------|
+| `templates/base.html` | Sidebar navigation, mobile toggle, toast container, shared assets |
+| `static/css/main.css` | CSS variables (colours, spacing), cards, forms, grids, **responsive breakpoints** (900px, 600px) |
+| `static/js/main.js` | Sidebar/backdrop, `apiCall()`, toasts, tabs, accordions |
+| `automata.html` | Cytoscape graph, playback bar, input tape, step pips |
+| `resolution.html` | Clause chips, resolution step list, CNF transformation rows |
+| `transformer.html` | NNF/CNF/DNF cards, truth table with horizontal scroll on small screens |
+| `welcome.html` + `welcome.css` | Landing page with module showcase; mobile hamburger menu |
+
+**Responsive design:** The UI adapts to phones and tablets — collapsible sidebar, stacked grids, scrollable tables, and full-width buttons on narrow viewports.
+
+---
+
+## Input Syntax
+
+### Propositional logic
 
 | Symbol | Operator | Example |
 |--------|----------|---------|
@@ -163,116 +412,121 @@ All computation is handled server-side. The frontend communicates via these JSON
 | `->` | Implication (→) | `p -> q` |
 | `<->` | Biconditional (↔) | `p <-> q` |
 
-Parentheses are fully supported: `(p | q) & (~p | r) & (~q | ~r)`
+Parentheses are supported: `(p | q) & (~p | r) & (~q | ~r)`
 
-### Finite Automaton Transitions
+### Finite automaton transitions
 
-One transition per line, format: `from_state, symbol, to_state`
-
-```
-q0, a, q1
-q0, b, q0
-q1, a, q2
-```
-
-### PDA Transitions
-
-Format: `state, input_symbol, stack_top, next_state, push_string`
+Semicolon-separated triples: `from_state, symbol, to_state`
 
 ```
-q0, a, Z, q1, AZ
-q1, a, A, q1, AA
-q1, b, A, q2, ε
-q2, b, A, q2, ε
-q2, ε, Z, q3, Z
+q0,a,q1;q0,b,q0;q1,a,q1;q1,b,q2;q2,a,q2;q2,b,q2
 ```
 
-Use `ε` for epsilon (no input consumed / no stack push).
+Use `ε` for epsilon transitions (NFA).
 
 ---
 
-## 🧠 Algorithm Details
+## Installation and Running
 
-### Finite Automata Simulation
-- **DFA:** Deterministic transition function δ: Q × Σ → Q. At each step, exactly one next state. Dead state on missing transition.
-- **NFA:** ε-closure via BFS over epsilon transitions. Each symbol maps the current state *set* to a new set. Accepts if the intersection with F ≠ ∅.
+### Prerequisites
 
-### Pushdown Automaton Simulation
-BFS over configurations `(state, remaining_input, stack)`. Supports non-determinism by exploring all successor configurations. Acceptance by final state or by empty stack (configurable). Search is bounded to prevent infinite loops on ambiguous grammars.
+- Python **3.10+** (developed and tested on 3.13)
+- pip
+- Optional: [Groq API key](https://console.groq.com) for AI explanations
 
-### Resolution Method
-1. Parse formula → AST (recursive descent parser)
-2. Eliminate biconditionals: `P ↔ Q ≡ (P → Q) ∧ (Q → P)`
-3. Eliminate implications: `P → Q ≡ ¬P ∨ Q`
-4. Push negations inward via De Morgan's laws → NNF
-5. Distribute ∨ over ∧ → CNF
-6. Extract clause set
-7. Pick pairs of clauses with complementary literals, derive resolvents
-8. Empty clause derivable → **UNSATISFIABLE**; saturation without empty clause → **SATISFIABLE**
+### Steps
 
-### NNF / CNF / DNF Transformation
-- **NNF:** Remove implications and biconditionals, push negations to literals
-- **CNF:** NNF + recursively distribute ∨ over ∧ — `P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)`
-- **DNF:** NNF + recursively distribute ∧ over ∨ — `P ∧ (Q ∨ R) ≡ (P ∧ Q) ∨ (P ∧ R)`
+```bash
+# 1. Navigate to project folder
+cd ProofLab-TFCS-Platform-v3.13.0
 
----
+# 2. Create virtual environment
+python -m venv venv
 
-## 🤖 AI Explainer
+# 3. Activate (Windows)
+venv\Scripts\activate
 
-Each module features a streaming AI explanation of the computation result:
+# 3. Activate (Linux / macOS)
+source venv/bin/activate
 
-- **Provider:** [Groq](https://groq.com) — free tier
-- **Model:** `llama-3.3-70b-versatile`
-- **Delivery:** Server-Sent Events (SSE), rendered progressively with markdown
-- **Context-aware:** The explainer receives the actual computation data (formula, steps, clauses, states) and references them directly — never generic output
+# 4. Install dependencies
+pip install -r requirements.txt
 
----
+# 5. (Optional) Create .env for AI explainer
+# GROQ_API_KEY=your_key_here
 
-## 🗺️ Demo Walkthrough
+# 6. Run the server
+python app.py
+```
 
-| Route | What to try |
-|-------|-------------|
-| `/` | Landing page — project overview and module showcase |
-| `/index` | Platform dashboard — module cards and quick-start links |
-| `/automata` | Load the "Binary divisible by 3" DFA example → Simulate → observe graph + step trace |
-| `/automata` (PDA tab) | Enter `aabb` on a balanced-string PDA → observe BFS stack trace |
-| `/resolution` | Enter `(p -> q) & (~q) & p` → proves **UNSATISFIABLE** via empty clause derivation |
-| `/transformer` | Enter `p \| ~p` → identified as **Tautology**, all three normal forms shown |
-| `/about` | Full documentation, API reference, and installation guide |
+Open **http://localhost:5000** in a browser.
 
 ---
 
-## 📦 Dependencies
+## Demo Guide for Evaluation
 
-| Package | Version |
-|---------|---------|
-| Flask | 3.1.3 |
-| Jinja2 | 3.1.6 |
-| Werkzeug | 3.1.8 |
-| click | 8.4.1 |
-| colorama | 0.4.6 |
-| itsdangerous | 2.2.0 |
-| MarkupSafe | 3.0.3 |
-| groq | latest |
+Suggested walkthrough for demonstrating the project:
 
----
-
-## 🗺️ Roadmap
-
-- [ ] Turing Machine Simulator
-- [ ] CYK Parser
-- [ ] Regular Expression Engine
-- [ ] Context-Free Grammar tools
-- [ ] Unification Algorithm
+| Step | Route | Action | What to observe |
+|------|-------|--------|-----------------|
+| 1 | `/` | Browse landing page | Project overview, module descriptions |
+| 2 | `/index` | Open dashboard | Three module cards |
+| 3 | `/automata` | Load **"Binary divisible by 3"** example → **Simulate** | State diagram, step playback, ACCEPT/REJECT verdict |
+| 4 | `/automata` | Switch to **NFA**, load **"NFA: ends in ab"** | ε-closure and multi-state trace |
+| 5 | `/resolution` | Enter `(p -> q) & (~q) & p` → **Solve** | CNF conversion, clause list, resolution steps → UNSAT |
+| 6 | `/transformer` | Enter `p \| ~p` → **Transform** | NNF/CNF/DNF steps, truth table → **Tautology** |
+| 7 | Any module | Click **Explain with AI** (if API key configured) | Streaming natural-language explanation |
 
 ---
 
-## 📄 License
+## Screenshots
 
-This project is open for educational use. Feel free to fork and build on it.
+### Welcome Page
+![Welcome Page](static/img/welcome.gif)
+
+### Automata Simulator — DFA / NFA
+![Automata Simulator](static/img/automata1.gif)
+
+### Formula Transformer — NNF / CNF / DNF
+![Formula Transformer](static/img/transformation.gif)
+
+### Resolution Solver
+![Resolution Solver](static/img/Resolution.gif)
+
+---
+
+## Dependencies
+
+| Package | Role |
+|---------|------|
+| Flask 3.1.3 | Web framework, routing, JSON responses |
+| Jinja2 3.1.6 | HTML template engine |
+| groq | AI explanation streaming (optional) |
+| Werkzeug | WSGI utilities (Flask dependency) |
+
+Full pinned list: see `requirements.txt`.
+
+---
+
+## Future Work
+
+- [ ] Turing Machine simulator  
+- [ ] CYK parser for context-free grammars  
+- [ ] Regular expression engine  
+- [ ] Unification algorithm UI (backend structure exists in `ai_explainer.py`)  
+- [ ] PDA simulator page (algorithm in `algorithms/pda.py`, API routes in `app.py`)  
+
+---
+
+## Conclusion
+
+ProofLab implements central TFCS algorithms — automata simulation, normal form transformation, and resolution — as a working web application with clear separation between **computation** (Python algorithms) and **presentation** (HTML/CSS/JS). Every module returns a structured step trace, making the tool suitable both as a course project deliverable and as a study aid for formal methods.
+
+The codebase is organised so that each algorithm file can be read independently, matching the modular structure of the course itself: define a formal system, implement the procedure, verify on examples.
 
 ---
 
 <div align="center">
-  <sub>Built by <strong>G1orga</strong> · ProofLab v3.13.0</sub>
+  <strong>Lasha Giorgadze (G1orga)</strong><br>
+  ProofLab v3.13.0 · Theoretical Foundations of Computer Science
 </div>
