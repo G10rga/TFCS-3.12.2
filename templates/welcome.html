@@ -39,7 +39,7 @@
         </div>
         <span class="nav-logo-name">Project By G1orga</span>
       </a>
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="#modules" class="nav-link">Modules</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#stack" class="nav-link">Tech Stack</a>
@@ -47,6 +47,11 @@
         <a href="/about" class="nav-link">Docs</a>
         <a href="/index" class="nav-cta">Open Platform →</a>
       </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
     </nav>
 
     <!-- HERO -->
@@ -729,91 +734,30 @@
               Beyond new modules, these cross-cutting improvements will enhance
               the platform experience across every tool.
             </p>
-            <div
-              style="
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 10px;
-                margin-top: 4px;
-              "
-            >
-              <div
-                style="
-                  background: rgba(255, 255, 255, 0.03);
-                  border: 1px solid var(--border);
-                  border-radius: 10px;
-                  padding: 14px 16px;
-                "
-              >
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 10px;
-                    color: var(--purple);
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
-                    margin-bottom: 6px;
-                  "
-                >
+            <div class="platform-expansions-grid">
+              <div class="platform-expansion-item">
+                <div class="platform-expansion-label" style="color: var(--purple);">
                   Export Engine
                 </div>
-                <div
-                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
-                >
+                <div class="platform-expansion-text">
                   Download proofs, derivations, and automata diagrams as PDF or
                   LaTeX — ready for homework submission.
                 </div>
               </div>
-              <div
-                style="
-                  background: rgba(255, 255, 255, 0.03);
-                  border: 1px solid var(--border);
-                  border-radius: 10px;
-                  padding: 14px 16px;
-                "
-              >
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 10px;
-                    color: var(--blue);
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="platform-expansion-item">
+                <div class="platform-expansion-label" style="color: var(--blue);">
                   History Log
                 </div>
-                <div
-                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
-                >
+                <div class="platform-expansion-text">
                   Persistent session history per module so you can revisit and
                   compare earlier computations.
                 </div>
               </div>
-              <div
-                style="
-                  background: rgba(255, 255, 255, 0.03);
-                  border: 1px solid var(--border);
-                  border-radius: 10px;
-                  padding: 14px 16px;
-                "
-              >
-                <div
-                  style="
-                    font-family: var(--mono);
-                    font-size: 10px;
-                    color: var(--green);
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
-                    margin-bottom: 6px;
-                  "
-                >
+              <div class="platform-expansion-item">
+                <div class="platform-expansion-label" style="color: var(--green);">
                   Step Mode
                 </div>
-                <div
-                  style="font-size: 12px; color: var(--sub); line-height: 1.6"
-                >
+                <div class="platform-expansion-text">
                   Unified step-through control across all modules — pause,
                   rewind, and replay any algorithm at your own pace.
                 </div>

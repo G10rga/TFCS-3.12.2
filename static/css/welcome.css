@@ -81,6 +81,43 @@ body {
 }
 .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
 
+.nav-toggle {
+  display: none;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nav-toggle svg { display: block; }
+
+.platform-expansions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+.platform-expansion-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.platform-expansion-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.platform-expansion-text {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.6;
+}
+
 /* ══════════════════════════════════════════════
    HERO
 ══════════════════════════════════════════════ */
@@ -798,17 +835,65 @@ body {
 ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .nav { padding: 16px 24px; }
-  .nav-links .nav-link { display: none; }
-  .section, .showcase, .tech-section, .demo-section { padding-left: 24px; padding-right: 24px; }
+  .nav-toggle { display: flex; align-items: center; justify-content: center; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 16px;
+    right: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 16px;
+    background: rgba(8,8,15,0.96);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 99;
+  }
+  .nav-links.open { display: flex; }
+  .nav-link { padding: 10px 14px; }
+  .nav-cta { margin-left: 0; text-align: center; justify-content: center; }
+  .section, .showcase, .tech-section, .demo-section, .roadmap-section, .cta-section { padding-left: 24px; padding-right: 24px; }
+  .section { padding-top: 80px; padding-bottom: 80px; }
+  .showcase { padding-bottom: 80px; }
+  .tech-section, .demo-section { padding-bottom: 80px; }
+  .roadmap-section { padding-top: 80px; padding-bottom: 80px; }
+  .cta-section { padding: 100px 24px; }
   .modules-grid { grid-template-columns: 1fr; }
   .module-card.wide { grid-column: span 1; }
-  .feature-row { grid-template-columns: 1fr; gap: 40px; }
+  .feature-row { grid-template-columns: 1fr; gap: 40px; padding: 48px 0; }
   .feature-row.reverse { direction: ltr; }
+  .feature-title { font-size: 28px; }
   .tech-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
   .footer { flex-direction: column; gap: 16px; text-align: center; }
+  .footer-right { flex-wrap: wrap; justify-content: center; }
   .roadmap-grid { grid-template-columns: 1fr; }
   .roadmap-card.featured { grid-column: span 1; }
   .roadmap-section::before { display: none; }
+  .platform-expansions-grid { grid-template-columns: 1fr; }
+  .terminal-body { padding: 20px 16px; font-size: 12px; }
+  .hero-sub { font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+  .nav { padding: 14px 16px; }
+  .nav-logo-name { font-size: 14px; }
+  .section, .roadmap-section { padding-top: 64px; padding-bottom: 64px; }
+  .section-title { font-size: clamp(28px, 8vw, 40px); }
+  .stats-inner { grid-template-columns: 1fr; padding: 0 24px; }
+  .stat-num { font-size: 32px; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto; }
+  .btn-hero-primary, .btn-hero-secondary { width: 100%; justify-content: center; }
+  .feature-visual { min-height: 200px; padding: 20px; }
+  .roadmap-card { padding: 20px; }
+  .rc-header { flex-direction: column; gap: 12px; }
+  .cta-actions { flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto; }
+  .cta-actions a { width: 100%; text-align: center; }
+  .hero-scroll { display: none; }
 }

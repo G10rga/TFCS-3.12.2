@@ -75,6 +75,23 @@
     font-family: var(--font-mono); transition: all var(--transition);
 }
 .copy-btn:hover { color: var(--text-primary); border-color: var(--accent-border); }
+
+@media (max-width: 900px) {
+    .doc-section-title { font-size: 19px; flex-wrap: wrap; }
+    .doc-section-title::after { display: none; }
+    .api-endpoint {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .endpoint-desc { margin-left: 0; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+    .tech-grid { grid-template-columns: 1fr; }
+    .algo-step { flex-direction: column; gap: 8px; }
+}
 </style>
 {% endblock %}
 

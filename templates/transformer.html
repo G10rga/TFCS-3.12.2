@@ -124,6 +124,16 @@ endblock %} {% block extra_css %}
     color: var(--blue);
     margin: 3px;
   }
+
+  @media (max-width: 900px) {
+    .transform-card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .result-formula { font-size: 13px; }
+    .truth-table { min-width: 320px; }
+  }
+
+  @media (max-width: 600px) {
+    .sym-btn, .ex-btn { padding: 8px 10px; }
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="page-header">
@@ -135,7 +145,7 @@ endblock %} {% block extra_css %}
       step-by-step derivations and truth table verification.
     </p>
   </div>
-  <div style="display: flex; gap: 8px">
+  <div class="page-header-meta">
     <span class="badge badge-info">NNF · CNF · DNF</span>
   </div>
 </div>

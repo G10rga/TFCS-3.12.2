@@ -6,16 +6,38 @@
 // ── Sidebar Toggle ─────────────────────────────────────
 const sidebar = document.getElementById('sidebar');
 const mobileToggle = document.getElementById('mobileToggle');
-const mainContent = document.getElementById('mainContent');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+function setSidebarOpen(open) {
+    if (!sidebar) return;
+    sidebar.classList.toggle('open', open);
+    sidebarBackdrop?.classList.toggle('visible', open);
+    document.body.classList.toggle('sidebar-open', open);
+    if (mobileToggle) {
+        mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+}
+
+function closeSidebar() {
+    setSidebarOpen(false);
+}
+
+if (mobileToggle && sidebar) {
+    mobileToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSidebarOpen(!sidebar.classList.contains('open'));
     });
 
-    // Close sidebar on outside click (mobile)
-    mainContent?.addEventListener('click', () => {
-        sidebar.classList.remove('open');
+    sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+    sidebar.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 900) closeSidebar();
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) closeSidebar();
     });
 }
 

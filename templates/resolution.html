@@ -203,6 +203,18 @@ endblock %} {% block extra_css %}
     color: var(--accent);
     border-color: var(--accent-border);
   }
+
+  @media (max-width: 900px) {
+    .transform-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .transform-label { min-width: 0; }
+    .transform-formula { width: 100%; word-break: break-all; }
+    .ai-explain-header { flex-wrap: wrap; gap: 10px; }
+    #ai-explain-output { padding: 16px; max-height: 60vh; }
+  }
+
+  @media (max-width: 600px) {
+    .example-btn, .sym-btn { font-size: 11px; padding: 6px 10px; }
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="page-header">
@@ -214,7 +226,7 @@ endblock %} {% block extra_css %}
       clauses, and applies the resolution method to determine satisfiability.
     </p>
   </div>
-  <div style="display: flex; gap: 8px">
+  <div class="page-header-meta">
     <span class="badge badge-error">Resolution</span>
     <span class="badge badge-warning">SAT</span>
   </div>

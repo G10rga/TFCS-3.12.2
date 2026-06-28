@@ -66,6 +66,36 @@ window.addEventListener('scroll', () => {
   document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
 });
 
+// ── Mobile nav toggle ──────────────────────────────────────
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+
+function closeNavMenu() {
+  navLinks?.classList.remove('open');
+  navToggle?.setAttribute('aria-expanded', 'false');
+}
+
+navToggle?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+navLinks?.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', closeNavMenu);
+});
+
+document.addEventListener('click', (e) => {
+  if (!navLinks?.classList.contains('open')) return;
+  if (!navLinks.contains(e.target) && !navToggle?.contains(e.target)) {
+    closeNavMenu();
+  }
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 900) closeNavMenu();
+});
+
 // ── Scroll reveal ──────────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
