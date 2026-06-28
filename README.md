@@ -1,9 +1,9 @@
-# ProofLab — Interactive TFCS Platform
+# ProofLab - Interactive TFCS Platform
 
-**Course:** Theoretical Foundations of Computer Science (TFCS)  
+**Course:** Theoretical Foundations of Computer Science & Python (TFCS)  
 **Author:** Lasha Giorgadze (G1orga)  
 **Version:** 3.13.0  
-**Type:** Final course project — web application
+**Type:** Final course project - Python
 
 ---
 
@@ -15,9 +15,9 @@ All **algorithmic logic is implemented in Python** on the server. The browser is
 
 The three main modules exposed in the UI are:
 
-1. **Automata Simulator** — DFA and NFA simulation with animated state diagrams  
-2. **Resolution Solver** — propositional resolution with CNF conversion and proof trace  
-3. **Formula Transformer** — NNF, CNF, DNF conversion plus truth table generation  
+1. **Automata Simulator** - DFA and NFA simulation with animated state diagrams  
+2. **Resolution Solver** - propositional resolution with CNF conversion and proof trace  
+3. **Formula Transformer** - NNF, CNF, DNF conversion plus truth table generation  
 
 ---
 
@@ -27,7 +27,7 @@ The three main modules exposed in the UI are:
 2. [Learning Objectives](#learning-objectives)
 3. [System Architecture](#system-architecture)
 4. [Project Structure](#project-structure)
-5. [How the Code Works — End-to-End Flow](#how-the-code-works--end-to-end-flow)
+5. [How the Code Works - End-to-End Flow](#how-the-code-works--end-to-end-flow)
 6. [Backend: Flask Application](#backend-flask-application)
 7. [Algorithm Modules](#algorithm-modules)
    - [Automata (`algorithms/automata.py`)](#1-automata-simulator-algorithmsautomatapy)
@@ -47,7 +47,7 @@ The three main modules exposed in the UI are:
 
 ## Project Motivation
 
-Formal methods courses cover abstract concepts — automata, normal forms, resolution proofs — that are difficult to understand from notation alone. Textbook examples show final results but rarely let students **experiment** with their own machines and formulas.
+Formal methods courses cover abstract concepts - automata, normal forms, resolution proofs - that are difficult to understand from notation alone. Textbook examples show final results but rarely let students **experiment** with their own machines and formulas.
 
 ProofLab addresses this by:
 
@@ -84,19 +84,19 @@ The application follows a classic **three-layer architecture**:
 ┌─────────────────────────────────────────────────────────────┐
 │  PRESENTATION LAYER (Browser)                               │
 │  templates/*.html  +  static/css  +  static/js              │
-│  — forms, sidebar, graphs, step lists, toasts               │
+│  - forms, sidebar, graphs, step lists, toasts               │
 └──────────────────────────┬──────────────────────────────────┘
                            │  HTTP (JSON POST / SSE)
 ┌──────────────────────────▼──────────────────────────────────┐
-│  APPLICATION LAYER (Flask — app.py)                         │
-│  — page routes (render HTML)                                │
-│  — API routes (validate input, call algorithms, return JSON)│
+│  APPLICATION LAYER (Flask - app.py)                         │
+│  - page routes (render HTML)                                │
+│  - API routes (validate input, call algorithms, return JSON)│
 └──────────────────────────┬──────────────────────────────────┘
                            │  Python function calls
 ┌──────────────────────────▼──────────────────────────────────┐
 │  ALGORITHM LAYER (algorithms/*.py)                          │
-│  — pure Python, no Flask dependency                         │
-│  — automata, resolution, transformer, ai_explainer          │
+│  - pure Python, no Flask dependency                         │
+│  - automata, resolution, transformer, ai_explainer          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -106,19 +106,19 @@ The application follows a classic **three-layer architecture**:
 User clicks "Simulate"
        │
        ▼
-automata.html  —  JavaScript collects form fields
+automata.html  -  JavaScript collects form fields
        │
        ▼
 POST /api/automata/simulate  { states, alphabet, transitions, input_string, fa_type }
        │
        ▼
-app.py  —  validate_automaton()  →  parse_automaton()  →  fa.simulate()
+app.py  -  validate_automaton()  →  parse_automaton()  →  fa.simulate()
        │
        ▼
 JSON response  { result: { steps, accepted }, graph: { nodes, edges } }
        │
        ▼
-JavaScript  —  renders Cytoscape graph + playback controls + step trace
+JavaScript  -  renders Cytoscape graph + playback controls + step trace
 ```
 
 The same pattern applies to resolution and transformation: **the frontend never implements the algorithm**; it only sends input and renders the structured JSON response.
@@ -161,11 +161,11 @@ ProofLab-TFCS-Platform-v3.13.0/
         └── ai-explain.js       # Server-Sent Events streaming handler
 ```
 
-**Design principle:** `algorithms/` contains no Flask imports. This makes each module testable in isolation and mirrors how algorithms are presented in the course — as self-contained procedures independent of any UI.
+**Design principle:** `algorithms/` contains no Flask imports. This makes each module testable in isolation and mirrors how algorithms are presented in the course - as self-contained procedures independent of any UI.
 
 ---
 
-## How the Code Works — End-to-End Flow
+## How the Code Works - End-to-End Flow
 
 ### 1. Page routes (HTML)
 
@@ -219,7 +219,7 @@ app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False   # preserve ¬, ∧, ∨ in JSON responses
 ```
 
-**Why Flask?** It is lightweight, maps naturally to a course project scope, and supports both server-rendered pages (Jinja2) and JSON APIs without a heavy framework. All TFCS logic stays in `algorithms/`, keeping `app.py` thin — it only routes requests and serialises results.
+**Why Flask?** It is lightweight, maps naturally to a course project scope, and supports both server-rendered pages (Jinja2) and JSON APIs without a heavy framework. All TFCS logic stays in `algorithms/`, keeping `app.py` thin - it only routes requests and serialises results.
 
 ---
 
@@ -231,11 +231,11 @@ app.config["JSON_AS_ASCII"] = False   # preserve ¬, ∧, ∨ in JSON responses
 
 A **finite automaton** is a tuple \(M = (Q, \Sigma, \delta, q_0, F)\):
 
-- \(Q\) — finite set of states  
-- \(\Sigma\) — input alphabet  
-- \(\delta\) — transition function (DFA: one state; NFA: set of states)  
-- \(q_0\) — start state  
-- \(F\) — accept states  
+- \(Q\) - finite set of states  
+- \(\Sigma\) - input alphabet  
+- \(\delta\) - transition function (DFA: one state; NFA: set of states)  
+- \(q_0\) - start state  
+- \(F\) - accept states  
 
 A string is **accepted** if, after reading all symbols, the machine is in an accept state (DFA) or the active state set intersects \(F\) (NFA).
 
@@ -375,7 +375,7 @@ Optional educational feature: after a computation, the user can request a **natu
 
 1. Frontend POSTs computation results to `/api/explain/<module>`  
 2. `explain_stream(module, data)` selects a prompt builder (`automata`, `resolution`, `transformer`)  
-3. The prompt includes **only the actual steps from the computation** — the model is instructed not to invent steps  
+3. The prompt includes **only the actual steps from the computation** - the model is instructed not to invent steps  
 4. Response is streamed via **Server-Sent Events (SSE)** and rendered as markdown in the UI  
 
 This layer does not affect correctness of the algorithms; it is a tutoring aid built on top of the structured JSON output.
@@ -396,7 +396,7 @@ This layer does not affect correctness of the algorithms; it is a tutoring aid b
 | `transformer.html` | NNF/CNF/DNF cards, truth table with horizontal scroll on small screens |
 | `welcome.html` + `welcome.css` | Landing page with module showcase; mobile hamburger menu |
 
-**Responsive design:** The UI adapts to phones and tablets — collapsible sidebar, stacked grids, scrollable tables, and full-width buttons on narrow viewports.
+**Responsive design:** The UI adapts to phones and tablets - collapsible sidebar, stacked grids, scrollable tables, and full-width buttons on narrow viewports.
 
 ---
 
@@ -484,10 +484,10 @@ Suggested walkthrough for demonstrating the project:
 ### Welcome Page
 ![Welcome Page](static/img/welcome.gif)
 
-### Automata Simulator — DFA / NFA
+### Automata Simulator - DFA / NFA
 ![Automata Simulator](static/img/automata1.gif)
 
-### Formula Transformer — NNF / CNF / DNF
+### Formula Transformer - NNF / CNF / DNF
 ![Formula Transformer](static/img/transformation.gif)
 
 ### Resolution Solver
@@ -520,7 +520,7 @@ Full pinned list: see `requirements.txt`.
 
 ## Conclusion
 
-ProofLab implements central TFCS algorithms — automata simulation, normal form transformation, and resolution — as a working web application with clear separation between **computation** (Python algorithms) and **presentation** (HTML/CSS/JS). Every module returns a structured step trace, making the tool suitable both as a course project deliverable and as a study aid for formal methods.
+ProofLab implements central TFCS algorithms - automata simulation, normal form transformation, and resolution - as a working web application with clear separation between **computation** (Python algorithms) and **presentation** (HTML/CSS/JS). Every module returns a structured step trace, making the tool suitable both as a course project deliverable and as a study aid for formal methods.
 
 The codebase is organised so that each algorithm file can be read independently, matching the modular structure of the course itself: define a formal system, implement the procedure, verify on examples.
 
