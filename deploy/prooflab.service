@@ -1,0 +1,17 @@
+[Unit]
+Description=ProofLab TFCS Platform (Gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/prooflab
+EnvironmentFile=/var/www/prooflab/.env
+Environment=PATH=/var/www/prooflab/venv/bin
+ExecStart=/var/www/prooflab/venv/bin/gunicorn -c gunicorn.conf.py app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,15 @@
+import os
 from groq import Groq
 from typing import Generator
 
-client = Groq(api_key="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")
-MODEL = "llama-3.3-70b-versatile"  # active Groq reasoning model with chain-of-thought; fallback: "llama-3.3-70b-versatile"
+MODEL = "llama-3.3-70b-versatile"
+
+
+def _get_client() -> Groq:
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY environment variable is not set")
+    return Groq(api_key=api_key)
 
 SYSTEM = (
     "You are a formal methods tutor embedded in an interactive platform. "
@@ -259,6 +266,7 @@ def explain_stream(module: str, data: dict) -> Generator[str, None, None]:
         raise ValueError(f"No explainer for module '{module}'")
 
     prompt = builder(data)
+    client = _get_client()
 
     stream = client.chat.completions.create(
         model=MODEL,

@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="static/css/welcome.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}" />
   </head>
   <body>
     <!-- NAV  -->
@@ -62,7 +62,7 @@
         muted
         loop
         playsinline
-        src="static/img/background1.mp4"
+        src="{{ url_for('static', filename='img/background1.mp4') }}"
       ></video>
       <canvas id="hero-canvas"></canvas>
       <div class="hero-gradient"></div>
@@ -240,7 +240,7 @@
         muted
         loop
         playsinline
-        src="static/img/background.mp4"
+        src="{{ url_for('static', filename='img/background.mp4') }}"
       ></video>
       <div class="video-overlay"></div>
       <div class="video-content reveal">
@@ -792,7 +792,7 @@
         muted
         loop
         playsinline
-        src="static/img/background.mp4"
+        src="{{ url_for('static', filename='img/background.mp4') }}"
       ></video>
       <div class="cta-overlay"></div>
       <div class="cta-content reveal">
@@ -821,6 +821,6 @@
       </div>
     </footer>
 
-    <script src="static/js/welcome.js"></script>
+    <script src="{{ url_for('static', filename='js/welcome.js') }}"></script>
   </body>
 </html>

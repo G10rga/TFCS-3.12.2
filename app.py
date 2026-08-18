@@ -1,5 +1,12 @@
 import sys
 import os
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from flask import Flask, render_template, request, jsonify
 from algorithms.automata import parse_automaton, validate_automaton
 from algorithms.pda import parse_pda

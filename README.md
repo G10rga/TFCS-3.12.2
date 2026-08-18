@@ -463,6 +463,122 @@ Open **http://localhost:5000** in a browser.
 
 ---
 
+## Ubuntu სერვერზე გაშვება (Production)
+
+Production-ში აპლიკაცია **Gunicorn + systemd + Nginx**-ით უნდა გაეშვას (Flask-ის `debug=True` სერვერზე არ გამოიყენება).
+
+### არქიტექტურა
+
+```
+ინტერნეტი → Nginx (:80) → Gunicorn (127.0.0.1:8000) → Flask app.py
+                ↓
+         static/ ფაილები პირდაპირ
+```
+
+### სწრაფი გზა (ავტომატური სკრიპტი)
+
+1. პროექტი ატვირთეთ სერვერზე (git clone ან scp):
+
+```bash
+sudo mkdir -p /var/www/prooflab
+sudo chown $USER:$USER /var/www/prooflab
+# ვარიანტი A: git
+git clone <your-repo-url> /var/www/prooflab
+# ვარიანტი B: არსებული საქაღალდის კოპირება
+# scp -r ProofLab-TFCS-Platform-v3.13.0/* user@server:/var/www/prooflab/
+```
+
+2. გაუშვით setup სკრიპტი:
+
+```bash
+cd /var/www/prooflab
+chmod +x deploy/ubuntu-setup.sh
+sudo DOMAIN=your-server-ip ./deploy/ubuntu-setup.sh
+# ან git repo-დან:
+# sudo REPO_URL=https://github.com/you/prooflab.git DOMAIN=192.168.1.10 ./deploy/ubuntu-setup.sh
+```
+
+3. AI ახსნებისთვის (სურვილისამებრ):
+
+```bash
+sudo nano /var/www/prooflab/.env
+# დაამატეთ: GROQ_API_KEY=your_key
+sudo systemctl restart prooflab
+```
+
+4. ბრაუზერში: `http://YOUR_SERVER_IP`
+
+### ხელით დაყენება (ნაბიჯ-ნაბიჯ)
+
+```bash
+# სისტემური პაკეტები
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip nginx git
+
+# აპლიკაცია
+cd /var/www/prooflab
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # შეავსეთ GROQ_API_KEY საჭიროების შემთხვევაში
+
+# უფლებები
+sudo chown -R www-data:www-data /var/www/prooflab
+
+# systemd
+sudo cp deploy/prooflab.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable prooflab
+sudo systemctl start prooflab
+
+# nginx — YOUR_DOMAIN შეცვალეთ IP-ით ან დომენით
+sudo sed 's/YOUR_DOMAIN/your-server-ip/' deploy/nginx-prooflab.conf \
+  | sudo tee /etc/nginx/sites-available/prooflab
+sudo ln -sf /etc/nginx/sites-available/prooflab /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### სასარგებლო ბრძანებები
+
+| მოქმედება | ბრძანება |
+|-----------|----------|
+| სტატუსი | `sudo systemctl status prooflab` |
+| გადატვირთვა | `sudo systemctl restart prooflab` |
+| ლოგები | `sudo journalctl -u prooflab -f` |
+| Nginx ტესტი | `sudo nginx -t` |
+
+### Deploy ფაილები
+
+| ფაილი | დანიშნულება |
+|------|-------------|
+| `gunicorn.conf.py` | Gunicorn workers, port 8000 |
+| `deploy/prooflab.service` | systemd unit |
+| `deploy/nginx-prooflab.conf` | Nginx reverse proxy + SSE |
+| `deploy/ubuntu-setup.sh` | ავტომატური დაყენება |
+| `.env.example` | გარემოს ცვლადების შაბлонი |
+
+### HTTPS (სურვილისამებრ)
+
+დომენის მიბმის შემდეგ:
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.edu.ge
+```
+
+### განახლება ახალი ვერსიის შემდეგ
+
+```bash
+cd /var/www/prooflab
+git pull
+source venv/bin/activate
+pip install -r requirements.txt
+sudo systemctl restart prooflab
+```
+
+---
+
 ## Demo Guide for Evaluation
 
 Suggested walkthrough for demonstrating the project:
