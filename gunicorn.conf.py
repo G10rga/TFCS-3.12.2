@@ -1,8 +1,9 @@
 """Gunicorn configuration for production (Ubuntu + systemd)."""
 
 import multiprocessing
+import os
 
-bind = "127.0.0.1:8000"
+bind = os.environ.get("GUNICORN_BIND", "127.0.0.1:8000")
 workers = max(2, multiprocessing.cpu_count())
 threads = 2
 timeout = 120

@@ -558,6 +558,42 @@ sudo nginx -t && sudo systemctl reload nginx
 | `deploy/ubuntu-setup.sh` | ავტომატური დაყენება |
 | `.env.example` | გარემოს ცვლადების შაბлонი |
 
+### Cloudflare Tunnel (Nginx-ის გარეშე)
+
+თუ საიტს **Cloudflare Tunnel**-ით აგზავნით, Nginx არ გჭირდებათ — `cloudflared` პირდაპირ Gunicorn-ზე მიუთითებს.
+
+1. აირჩიეთ თავისუფალი პორტი (მაგ. `8003`):
+
+```bash
+ss -tlnp | grep -E ':800[0-9]'
+```
+
+2. `.env`-ში დაამატეთ:
+
+```bash
+GUNICORN_BIND=127.0.0.1:8003
+```
+
+3. გადატვირთეთ სერვისი:
+
+```bash
+sudo systemctl restart prooflab
+curl -I http://127.0.0.1:8003
+```
+
+4. Cloudflare Tunnel ingress (მაგ. `~/.cloudflared/config.yml`):
+
+```yaml
+ingress:
+  - hostname: prooflab.yourdomain.com
+    service: http://127.0.0.1:8003
+  - service: http_status:404
+```
+
+ან სწრაფი ტესტი: `cloudflared tunnel --url http://127.0.0.1:8003`
+
+AI streaming (SSE) Cloudflare Tunnel-ით ჩვეულებრივ მუშაობს.
+
 ### HTTPS (სურვილისამებრ)
 
 დომენის მიბმის შემდეგ:
